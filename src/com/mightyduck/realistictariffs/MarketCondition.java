@@ -1,0 +1,13 @@
+package com.mightyduck.realistictariffs;
+
+public enum MarketCondition {
+    DEMAND_CRITICAL,
+    DEMAND_MODERATE,
+    DEMAND_MINOR,
+    WAR_MULTIPLE,
+    WAR_SINGLE,
+    FACTION_BUYBACK_HEGEMONY,
+    FACTION_BUYBACK_LUDDICPATH,
+    FACTION_BUYBACK_LUDDICCHURCH,
+    FACTION_BUYBACK_TRITACHYON
+}
