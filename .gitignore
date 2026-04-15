@@ -22,3 +22,14 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+/RealisticTariffs/.idea/artifacts/RealisticTariffs.xml
+/RealisticTariffs/.idea/libraries/starfarer_api.xml
+/RealisticTariffs/.idea/.gitignore
+/RealisticTariffs/.idea/compiler.xml
+/RealisticTariffs/.idea/misc.xml
+/RealisticTariffs/.idea/modules.xml
+/RealisticTariffs/.idea/uiDesigner.xml
+/RealisticTariffs/.idea/vcs.xml
+/RealisticTariffs/out/
+/RealisticTariffs/RealisticTariffs.iml
+/out/
