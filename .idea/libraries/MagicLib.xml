@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="MagicLib">
+    <CLASSES>
+      <root url="jar://D:/Games/StarSector.v0.9.8a-RC8/StarSector.v0.9.8a-RC8/game/mods/MagicLib/jars/MagicLib.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://D:/Games/StarSector.v0.9.8a-RC8/StarSector.v0.9.8a-RC8/game/mods/MagicLib/jars/MagicLib.jar!/" />
+      <root url="jar://D:/Games/StarSector.v0.9.8a-RC8/StarSector.v0.9.8a-RC8/game/mods/MagicLib/jars/MagicLib.jar!/" />
+    </SOURCES>
+  </library>
+</component>

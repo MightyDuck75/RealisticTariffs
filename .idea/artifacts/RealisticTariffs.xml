@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="RealisticTariffs">
+    <output-path>$PROJECT_DIR$/out/artifacts/RealisticTariffs</output-path>
+    <root id="root">
+      <element id="directory" name="jars">
+        <element id="archive" name="RealisticTariffs.jar">
+          <element id="module-output" name="RealisticTariffs" />
+        </element>
+      </element>
+      <element id="file-copy" path="$PROJECT_DIR$/mod_info.json" />
+      <element id="directory" name="data">
+        <element id="directory" name="config">
+          <element id="file-copy" path="$PROJECT_DIR$/data/config/rt_settings.json" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
