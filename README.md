@@ -9,11 +9,13 @@ Additionally, Ship & Weapons buy & sell prices now increase if there are deficit
 To add some extra flavor selling faction design ships to their factions provides reputation and boost in credits when these factions are at war, in particular to XIV battlegroup ships.
 
 ---
-## Why did I made this mod ?
+## Why did I make this mod ?
 First as of 2026 in vanilla **Starsector** you don't get a notification when there is significant demand for commodities, secondly tariffs are not immersive or logical the main purpose 
 of tariffs is to control imports & is usually done in a per commodity basis.
 Since it's impossible or extremely complex to apply a tariff per commodity, I try the second-best thing, I make it so that submarkets that cant meet the demand of multiple commodities 
 progressively lower these, as a normal government would do.
+
+![](https://raw.githubusercontent.com/MightyDuck75/RealisticTariffs/refs/heads/main/Readme_Imgs/VanillaTariffs.jpg)
 
 ## 📉 Dynamic Tariff Scaling
 The mod monitors every submarket(planet, station..) known to the player, when a market has deficit in a commodity, the local 
@@ -48,6 +50,8 @@ until they reach the minimum value of 3%.
     * Upon leaving the trade menu, the government issues a **full credit refund** directly to the player.
     * *Note: Rebates do not apply to illegal goods (Drugs/Organs).*
 
+![](https://raw.githubusercontent.com/MightyDuck75/RealisticTariffs/refs/heads/main/Readme_Imgs/TariffsRebate.jpg)
+
 * **Ship Market Overhaul:**
     * **Ships Hulls & Weapons Deficit Impacts Prices** Ships & weapons selling/buying prices now fluctuate based on the local market ship hulls & weapons 
 deficit.
@@ -58,10 +62,13 @@ faction markets receive a credit boost of 10% and +1 reputation, if XIV battlegr
 20% of the base value and +4 reputation. (If the player insteads sells to a different market he will not receive the extra credits
 and also lose -1 rep or -8 for XIV ships)
 
+
 * **Smart Intel Notifications:**
     * Custom Intel entries appear in your log for any market with **Shortages**, if there arent many commodities missing you will find this
 on the trade section, while more missing good will add intel messages to the important section.
     * Custom Intel entries for ship buyback programs and information which markets are currently involved in faction wars.
+
+![](https://raw.githubusercontent.com/MightyDuck75/RealisticTariffs/refs/heads/main/Readme_Imgs/NewIntel.jpg)
 
 ---
 
