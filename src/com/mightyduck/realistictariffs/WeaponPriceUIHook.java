@@ -8,20 +8,11 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import org.apache.log4j.Logger;
 
 public class WeaponPriceUIHook implements EveryFrameScript {
-    // Store original vanilla values to reset them later
-    private float originalWeaponSellMult, originalWeaponBuyMult;
     private boolean initialized = false;
     private static final Logger log = Global.getLogger(WeaponPriceUIHook.class);
 
     @Override
     public void advance(float amount) {
-        // 1. Initialize original values once
-        if (!initialized) {
-            originalWeaponSellMult = Global.getSettings().getFloat("shipWeaponSellPriceMult");
-            originalWeaponBuyMult = Global.getSettings().getFloat("shipWeaponBuyPriceMult");
-            initialized = true;
-        }
-
         InteractionDialogAPI dialog = Global.getSector().getCampaignUI().getCurrentInteractionDialog();
 
         // 2. If the player is interacting with a market, apply the "War Surcharge"
@@ -41,13 +32,11 @@ public class WeaponPriceUIHook implements EveryFrameScript {
         float currentWeaponBuyPriceMul = Global.getSettings().getFloat("shipWeaponBuyPriceMult");
         float currentWeaponSellPriceMul = Global.getSettings().getFloat("shipWeaponSellPriceMult");
 
-        if ( currentWeaponBuyPriceMul != buyWeaponMult) {
+        if ( currentWeaponBuyPriceMul != buyWeaponMult)
             Global.getSettings().setFloat("shipWeaponBuyPriceMult", RealisticTariffPlugin.getOriginalWeaponBuyMult() + buyWeaponMult);
-        }
-        if ( currentWeaponSellPriceMul != sellWeaponMult)
-            // Apply the boost to the global settings temporarily
-            Global.getSettings().setFloat("shipWeaponSellPriceMult", RealisticTariffPlugin.getOriginalWeaponSellMult() + sellWeaponMult);
 
+        if ( currentWeaponSellPriceMul != sellWeaponMult)
+            Global.getSettings().setFloat("shipWeaponSellPriceMult", RealisticTariffPlugin.getOriginalWeaponSellMult() + sellWeaponMult);
 
 //        WeaponPriceUIHook.log.info("WeaponPriceUIHook: shipWeaponBuyPriceMult : " + (RealisticTariffPlugin.getOriginalWeaponBuyMult() + buyWeaponMult) +
 //                " shipWeaponSellPriceMult : "+ (RealisticTariffPlugin.getOriginalWeaponSellMult() + sellWeaponMult) +

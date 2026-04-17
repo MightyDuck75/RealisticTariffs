@@ -129,7 +129,7 @@ public class MarketConditionIntel extends BaseMarketIntel {
                         "particularly for those belonging to the XIV Battlegroup.",
                         opad, faction.getBaseUIColor(), fName);
                 info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.FactionShipSellBonus));
-                info.addPara(" %s Selling XIV Ships", 0f, h, formatBoost(RTConfig.ExoticShipSellPriceBonus));
+                info.addPara(" %s Selling XIV Battlegroup Ships", 0f, h, formatBoost(RTConfig.ExoticShipSellPriceBonus));
                 break;
             case FACTION_BUYBACK_LUDDICPATH, FACTION_BUYBACK_LUDDICCHURCH, FACTION_BUYBACK_TRITACHYON:
                 info.addPara("With war placing increasing pressure on fleet strength, %s has initiated a ship buyback program to recover and redeploy" +

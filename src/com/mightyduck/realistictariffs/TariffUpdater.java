@@ -47,8 +47,7 @@ public class TariffUpdater implements EveryFrameScript {
 
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             if (!isValidMarket(market)) continue;
-            // BUG MAybe around here
-            // --- 1. CALCULATE SHORTAGES ---
+
             int totalShortages = 0;
             float sumTariffReduction = 0;
 
@@ -156,9 +155,17 @@ public class TariffUpdater implements EveryFrameScript {
         }
 
         if (totalShortages >= INTEL_TRIGGER_THRESHOLD && existingIntel == null) {
+            // Intel doesn't exist yet, create it.
             Global.getSector().getIntelManager().addIntel(new DeficitIntel(market));
+
         } else if (totalShortages < INTEL_TRIGGER_THRESHOLD && existingIntel != null) {
-            existingIntel.endAfterDelay(0.1f);
+            // FIX: If deficits are solved, this instantly deletes the intel.
+            existingIntel.endAfterDelay(0f);
+
+        } else if (existingIntel != null) {
+            // FIX: Intel exists and there are still shortages.
+            // Force the intel to re-evaluate its stats so it can change titles/tabs!
+            existingIntel.refreshShortageStats();
         }
     }
 
@@ -188,7 +195,6 @@ public class TariffUpdater implements EveryFrameScript {
         // We only apply it if the adjustment isn't 0 (to keep the UI clean)
         if (finalAdjustment != 0) {
             market.getTariff().modifyFlat(MOD_ID, finalAdjustment, "Realistic Tariffs Adjustment");
-            float finalTariff = market.getTariff().getModifiedValue();
         }
     }
 }

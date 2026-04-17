@@ -276,6 +276,7 @@ public class FactionShipBuyBack implements EveryFrameScript{
                 if (member.getId().equals(shipId)) return true;
             }
         }
+
         return false;
     }
 

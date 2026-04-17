@@ -43,20 +43,17 @@ public class DeficitIntel extends BaseMarketIntel {
         if (hasOnlyIllegalGoodsDemand) {
             return "Shortages of illicit goods in " + market.getName();
         }
-        //Normal goods
-        if ((countNormalGoods - countIllegalGoods) > 2) {
+
+        float tariff = market.getTariff().getModifiedValue();
+
+        if (tariff <= 0.09f) {
             return "Critical Shortages in " + market.getName();
         }
-
-        if ((countNormalGoods - countIllegalGoods) == 2) {
+        if (tariff > 0.09f && tariff <= 0.14f ) {
             return "Severe Shortages in " + market.getName();
         }
 
-        // 1 supplies 1 illicit goods
-        if ((countNormalGoods - countIllegalGoods) >= 1 || (countNormalGoods >= 1)) {
-            return "Shortages in " + market.getName();
-        }
-        return String.format("Error %d %d %b ", countNormalGoods, countIllegalGoods, hasOnlyIllegalGoodsDemand);
+        return "Shortages in " + market.getName();
     }
 
     @Override
@@ -76,7 +73,6 @@ public class DeficitIntel extends BaseMarketIntel {
 
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
-
         if (countNormalGoods > 0 || countIllegalGoods > 0) {
             info.addImage(getIcon(), width, 128f, 10f);
 
@@ -114,10 +110,12 @@ public class DeficitIntel extends BaseMarketIntel {
         return tags;
     }
 
-    private void refreshShortageStats() {
+    public void refreshShortageStats() {
         countIllegalGoods = 0;
         countNormalGoods = 0;
         hasOnlyIllegalGoodsDemand = false; // Reset here
+        mapLegalCommoditiesDeficit.clear();
+        mapIllegalCommoditiesDeficit.clear();
 
         for (CommodityOnMarketAPI commMkrt : market.getCommoditiesCopy()) {
             if (commMkrt.getMaxDemand() > commMkrt.getAvailable()) {
