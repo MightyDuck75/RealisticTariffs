@@ -168,7 +168,7 @@ public class FactionShipBuyBack implements EveryFrameScript{
         Color highlightColor = Misc.getHighlightColor();
         Color textBaseColor = Misc.getTextColor();
 
-        // --- Process Exotic Rewards ---
+        // Exotic/Rare Ships like XIV Battlegroup
         if (exoticBonusCredits > 0 || !exoticRepChanges.isEmpty()) {
             if (exoticBonusCredits > 0) {
                 playerFleet.getCargo().getCredits().add(exoticBonusCredits);
@@ -196,10 +196,6 @@ public class FactionShipBuyBack implements EveryFrameScript{
             // Only show credit message if credits were actually awarded (since sometimes it's rep only)
             if (regularBonusCredits > 0) {
                 String creditsStr = Misc.getDGSCredits(regularBonusCredits);
-//                Global.getSector().getCampaignUI().getMessageDisplay().addMessage(
-//                        "Ship Buyback Program: Local authorities issued a rebate of " + creditsStr + " credits for selling faction hulls.",
-//                        textBaseColor, creditsStr, highlightColor
-//                );
                 Global.getSector().getCampaignUI().addMessage("Ship Buyback Program: Local authorities issued a rebate of " + creditsStr + " credits for selling faction hulls.", textBaseColor );
 
             } else {

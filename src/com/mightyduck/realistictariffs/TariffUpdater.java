@@ -57,6 +57,7 @@ public class TariffUpdater implements EveryFrameScript {
                     String id = commodity.getId();
                     if (commodity.getMaxDemand() > commodity.getAvailable()){
                         if (!id.equals(Commodities.DRUGS) && !id.equals(Commodities.ORGANS)) {
+
                             switch (commodity.getId()) {
                                 case Commodities.SHIPS:
                                 sumTariffReduction += RTConfig.CommoditiesSHIPSTariffImpact;
@@ -110,6 +111,10 @@ public class TariffUpdater implements EveryFrameScript {
                                     sumTariffReduction += RTConfig.CommoditiesRARE_ORETariffImpact;
                                     //TariffUpdater.log.info("TariffUpdater Market : " + market.getName() + " Commodities.RARE_ORE sumTariffReduction: "+ sumTariffReduction + "%" +" Tariff ModifiedValue: "+ (int)(market.getTariff().getModifiedValue() * 100f) +" %");
                                     break;
+                                case Commodities.ORE:
+                                    sumTariffReduction += RTConfig.CommoditiesORETariffImpact;
+                                    //TariffUpdater.log.info("TariffUpdater Market : " + market.getName() + " Commodities.RARE_ORE sumTariffReduction: "+ sumTariffReduction + "%" +" Tariff ModifiedValue: "+ (int)(market.getTariff().getModifiedValue() * 100f) +" %");
+                                    break;
                                 case Commodities.SUPPLIES:
                                     sumTariffReduction += RTConfig.CommoditiesSUPPLIESTariffImpact;
                                     //TariffUpdater.log.info("TariffUpdater Market : " + market.getName() + " Commodities.SUPPLIES sumTariffReduction: "+ sumTariffReduction + "%" +" Tariff ModifiedValue: "+ (int)(market.getTariff().getModifiedValue() * 100f) +" %");
@@ -119,6 +124,7 @@ public class TariffUpdater implements EveryFrameScript {
                                     //TariffUpdater.log.info("TariffUpdater Market : " + market.getName() + " Commodities.VOLATILES sumTariffReduction: "+ sumTariffReduction + "%" +" Tariff ModifiedValue: "+ (int)(market.getTariff().getModifiedValue() * 100f) +" %");
                                     break;
                             }
+
                         }
                         totalShortages++;
                     }

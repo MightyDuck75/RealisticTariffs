@@ -13,9 +13,8 @@ import java.util.List;
 
 public class DeficitIntel extends BaseMarketIntel {
     private int countIllegalGoods = 0, countNormalGoods = 0;
-    private Boolean hasOnlyIllegalGoodsDemand = false;
-    private String intelTitleMsg = "";
-    private Color intelTitleBlueColor, goldColor, grayColor;
+    private Boolean hasOnlyIllegalGoodsDemand;
+    private final Color intelTitleBlueColor, goldColor, grayColor;
 
     private List<String> mapLegalCommoditiesDeficit = new ArrayList<>();
     private final List<String> mapIllegalCommoditiesDeficit = new ArrayList<>();
@@ -59,7 +58,7 @@ public class DeficitIntel extends BaseMarketIntel {
     @Override
     public void createIntelInfo(TooltipMakerAPI info, ListInfoMode mode) {
         if (countNormalGoods > 0 || countIllegalGoods > 0) {
-            intelTitleMsg = getName();
+            String intelTitleMsg = getName();
             info.addPara(intelTitleMsg, 0f, intelTitleBlueColor, market.getTextColorForFactionOrPlanet());
             if (intelTitleMsg.startsWith("Shortages of illicit goods in ")) {
                 info.addPara("Profitable opportunities for those dealing in illegal goods", grayColor, 3f);
@@ -102,9 +101,11 @@ public class DeficitIntel extends BaseMarketIntel {
     public Set<String> getIntelTags(SectorMapAPI map) {
         Set<String> tags = super.getIntelTags(map);
 
-        if (countNormalGoods > 2 && !hasOnlyIllegalGoodsDemand)
+        float tariff = market.getTariff().getModifiedValue();
+
+        if (tariff <= 0.09f && !hasOnlyIllegalGoodsDemand)
             tags.add(Tags.INTEL_IMPORTANT);
-        if (countNormalGoods >= 1 || countIllegalGoods >= 1)
+        if (tariff > 0.09f || countIllegalGoods >= 1)
             tags.add(Tags.INTEL_TRADE);
 
         return tags;
