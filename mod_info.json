@@ -7,7 +7,7 @@
     "minor":9,
     "patch":1
   },
-  "description": "Annoyed for paying tariffs to a planet starving? or in need of your goods, this mod is for you!",
+  "description": "Annoyed for paying tariffs to a starving planet? or in need of critical goods, this mod is for you!",
   "gameVersion": "0.98a-RC8",
   "java17": true,
   "jars": ["jars/RealisticTariffs.jar"],
