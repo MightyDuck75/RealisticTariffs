@@ -63,7 +63,6 @@ public class RTConfig {
             // Extract the sub-objects
             JSONObject tariffs = settings.getJSONObject("Tariff Commodity Demand Values");
             JSONObject armaments = settings.getJSONObject("Ship & Armaments Values");
-            JSONObject sounds = settings.getJSONObject("Realistic Tariffs Sounds");
 
             // Parse Tariffs (optDouble prevents crashes if a player deletes a line by mistake)
             isExportRebateActive = tariffs.optBoolean("isExportRebateActive", true);
@@ -143,7 +142,6 @@ public class RTConfig {
 
     private static void mapCommoditiesAndTheirTariffImpact(){
         tariffImpacts.clear();
-        tariffImpacts = new HashMap<>();
         tariffImpacts.put(Commodities.SHIPS, commoditiesSHIPSTariffImpact);
         tariffImpacts.put(Commodities.CREW,commoditiesCREWTariffImpact);
         tariffImpacts.put(Commodities.DOMESTIC_GOODS,commoditiesDOMESTIC_GOODSTariffImpact);
