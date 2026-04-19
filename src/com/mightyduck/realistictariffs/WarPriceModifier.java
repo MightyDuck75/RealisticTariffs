@@ -16,9 +16,9 @@ public class WarPriceModifier {
         if (wars <= 0) return 0f;
 
         if(wars == 1)
-            return RTConfig.ShipWarPricesBonus;
+            return RTConfig.shipWarPricesBonus;
         else
-            return RTConfig.ShipMultipleWarsPricesBonus;
+            return RTConfig.shipMultipleWarsPricesBonus;
     }
 
     public static float getWeaponsWarMultiplier(MarketAPI market) {
@@ -29,9 +29,9 @@ public class WarPriceModifier {
         if (wars <= 0) return 0f;
 
         if(wars == 1)
-            return RTConfig.WeaponsWarPricesBonus;
+            return RTConfig.weaponsWarPricesBonus;
         else
-            return RTConfig.WeaponsMultipleWarsPricesBonus;
+            return RTConfig.weaponsMultipleWarsPricesBonus;
     }
 
     private static int countFactionWarsMinusPiratesAndTerrorists(FactionAPI faction){
@@ -56,7 +56,7 @@ public class WarPriceModifier {
             if (faction.isHostileTo(other)) {
                 wars++;
             }
-        };
+        }
 
         return wars;
     }

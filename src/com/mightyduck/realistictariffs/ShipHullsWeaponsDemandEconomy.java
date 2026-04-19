@@ -3,7 +3,7 @@ package com.mightyduck.realistictariffs;
 import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 
-public class ShipWeaponsDemandEconomy {
+public class ShipHullsWeaponsDemandEconomy {
     public static float getShipDemandSellMultiplier(MarketAPI market) {
         CommodityOnMarketAPI ships = market.getCommodityData("ships");
         if (ships == null) return 0f;
@@ -15,11 +15,11 @@ public class ShipWeaponsDemandEconomy {
             demandBonus = 0f;
         else {
             if (deficit >= 3)
-                demandBonus = RTConfig.ShipsDemandHighSellPriceBoost;
+                demandBonus = RTConfig.shipsDemandHighSellPriceBoost;
             else if (deficit == 1)
-                demandBonus = RTConfig.ShipsDemandMinorSellPriceBoost;
+                demandBonus = RTConfig.shipsDemandMinorSellPriceBoost;
             else
-                demandBonus = RTConfig.ShipsDemandModerateSellPriceBoost;
+                demandBonus = RTConfig.shipsDemandModerateSellPriceBoost;
         }
         return demandBonus;
     }
@@ -35,11 +35,11 @@ public class ShipWeaponsDemandEconomy {
             demandBonus = 0f;
         else {
             if (deficit >= 3)
-                demandBonus = RTConfig.ShipsDemandHighBuyPriceBoost;
+                demandBonus = RTConfig.shipsDemandHighBuyPriceBoost;
             else if (deficit == 1)
-                demandBonus = RTConfig.ShipsDemandMinorBuyPriceBoost;
+                demandBonus = RTConfig.shipsDemandMinorBuyPriceBoost;
             else
-                demandBonus = RTConfig.ShipsDemandModerateBuyPriceBoost;
+                demandBonus = RTConfig.shipsDemandModerateBuyPriceBoost;
         }
         return demandBonus;
     }
@@ -55,11 +55,11 @@ public class ShipWeaponsDemandEconomy {
             demandBonus = 0f;
         else {
             if(deficit>=3)
-                demandBonus =  RTConfig.WeaponsDemandHighSellPriceBoost;
+                demandBonus =  RTConfig.weaponsDemandHighSellPriceBoost;
             else if (deficit == 1)
-                demandBonus = RTConfig.WeaponsDemandMinorSellPriceBoost;
+                demandBonus = RTConfig.weaponsDemandMinorSellPriceBoost;
             else
-                demandBonus = RTConfig.WeaponsDemandModerateSellPriceBoost;
+                demandBonus = RTConfig.weaponsDemandModerateSellPriceBoost;
         }
         return demandBonus;
     }
@@ -75,11 +75,11 @@ public class ShipWeaponsDemandEconomy {
             demandBonus = 0f;
         else {
             if(deficit>=3)
-                demandBonus =  RTConfig.WeaponsDemandHighBuyPriceBoost;
+                demandBonus =  RTConfig.weaponsDemandHighBuyPriceBoost;
             else if (deficit == 1)
-                demandBonus = RTConfig.WeaponsDemandMinorBuyPriceBoost;
+                demandBonus = RTConfig.weaponsDemandMinorBuyPriceBoost;
             else
-                demandBonus = RTConfig.WeaponsDemandModerateBuyPriceBoost;
+                demandBonus = RTConfig.weaponsDemandModerateBuyPriceBoost;
         }
         return demandBonus;
     }

@@ -117,4 +117,3 @@ always welcomed!
   - disable rebates & factional ship buybacks, 
   - the default & min tariff amount, 
   - boost to Ships and Weapons price changes..
-

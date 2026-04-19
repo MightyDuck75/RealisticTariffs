@@ -1,6 +1,6 @@
 package com.mightyduck.realistictariffs;
 
-public enum MarketCondition {
+public enum ShipHullsWeaponsIntelMarketCondition {
     DEMAND_CRITICAL,
     DEMAND_MODERATE,
     DEMAND_MINOR,

@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class MarketDeficitTariffIntel extends BaseMarketIntel {
+public class DeficitTariffMarketIntel extends BaseMarketIntel {
     private int countIllegalGoods = 0, countNormalGoods = 0;
     private Boolean hasOnlyIllegalGoodsDemand;
     private final Color intelTitleBlueColor, goldColor, grayColor;
@@ -27,7 +27,7 @@ public class MarketDeficitTariffIntel extends BaseMarketIntel {
             Commodities.VOLATILES
     );
 
-    public MarketDeficitTariffIntel(MarketAPI market) {
+    public DeficitTariffMarketIntel(MarketAPI market) {
         super(market);
         intelTitleBlueColor = Misc.getBasePlayerColor();
         goldColor = Misc.getHighlightColor();
@@ -45,10 +45,10 @@ public class MarketDeficitTariffIntel extends BaseMarketIntel {
 
         float tariff = market.getTariff().getModifiedValue();
 
-        if (tariff <= RTConfig.CriticalTariffThreshold) {
+        if (tariff <= RTConfig.criticalTariffThreshold) {
             return "Critical Shortages in " + market.getName();
         }
-        if (tariff > RTConfig.CriticalTariffThreshold && tariff <= RTConfig.SevereTariffThreshold ) {
+        if (tariff > RTConfig.criticalTariffThreshold && tariff <= RTConfig.severeTariffThreshold) {
             return "Severe Shortages in " + market.getName();
         }
 
@@ -103,9 +103,9 @@ public class MarketDeficitTariffIntel extends BaseMarketIntel {
 
         float tariff = market.getTariff().getModifiedValue();
 
-        if (tariff <= RTConfig.CriticalTariffThreshold && !hasOnlyIllegalGoodsDemand)
+        if (tariff <= RTConfig.criticalTariffThreshold && !hasOnlyIllegalGoodsDemand)
             tags.add(Tags.INTEL_IMPORTANT);
-        if (tariff > RTConfig.CriticalTariffThreshold || countIllegalGoods >= 1)
+        if (tariff > RTConfig.criticalTariffThreshold || countIllegalGoods >= 1)
             tags.add(Tags.INTEL_TRADE);
 
         return tags;
@@ -129,6 +129,7 @@ public class MarketDeficitTariffIntel extends BaseMarketIntel {
                 }
             }
         }
+
         if (countNormalGoods == 0 && countIllegalGoods > 0)
             hasOnlyIllegalGoodsDemand = true;
     }

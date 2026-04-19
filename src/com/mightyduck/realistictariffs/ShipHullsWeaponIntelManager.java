@@ -13,7 +13,7 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import java.util.*;
 import java.util.List;
 
-public class ShipsHullWeaponIntelManager implements EveryFrameScript {
+public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     private final IntervalUtil tracker = new IntervalUtil(1f, 1f); // Check once per day
 
     // Define which factions have specific/elite ships for the buyback programs
@@ -100,16 +100,16 @@ public class ShipsHullWeaponIntelManager implements EveryFrameScript {
 
     private void syncIntelForMarket(MarketAPI market, List<ShipHullsWeaponsIntelMarketCondition> activeConditions) {
         // Find all existing intel for this market currently displayed to the player
-        List<ShipHullsWeaponsIntel> existingIntel = new ArrayList<>();
-        for (IntelInfoPlugin plugin : Global.getSector().getIntelManager().getIntel(ShipHullsWeaponsIntel.class)) {
-            ShipHullsWeaponsIntel intel = (ShipHullsWeaponsIntel) plugin;
+        List<ShipHullsWeaponsMarketIntel> existingIntel = new ArrayList<>();
+        for (IntelInfoPlugin plugin : Global.getSector().getIntelManager().getIntel(ShipHullsWeaponsMarketIntel.class)) {
+            ShipHullsWeaponsMarketIntel intel = (ShipHullsWeaponsMarketIntel) plugin;
             if (intel.getMarket() == market && !intel.isEnding() && !intel.isEnded()) {
                 existingIntel.add(intel);
             }
         }
 
         // Clean up conditions that are no longer true
-        for (ShipHullsWeaponsIntel intel : existingIntel) {
+        for (ShipHullsWeaponsMarketIntel intel : existingIntel) {
             if (!activeConditions.contains(intel.getCondition())) {
                 intel.endAfterDelay(); // Gracefully archives the intel before removal
             }
@@ -118,14 +118,14 @@ public class ShipsHullWeaponIntelManager implements EveryFrameScript {
         // Create new intel for conditions that just started
         for (ShipHullsWeaponsIntelMarketCondition condition : activeConditions) {
             boolean exists = false;
-            for (ShipHullsWeaponsIntel intel : existingIntel) {
+            for (ShipHullsWeaponsMarketIntel intel : existingIntel) {
                 if (intel.getCondition() == condition) {
                     exists = true;
                     break;
                 }
             }
             if (!exists) {
-                Global.getSector().getIntelManager().addIntel(new ShipHullsWeaponsIntel(market, condition));
+                Global.getSector().getIntelManager().addIntel(new ShipHullsWeaponsMarketIntel(market, condition));
             }
         }
     }

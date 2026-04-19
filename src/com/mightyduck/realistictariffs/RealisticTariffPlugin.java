@@ -15,8 +15,8 @@ public class RealisticTariffPlugin extends BaseModPlugin {
     private static float originalWeaponBuyMult, originalWeaponSellMult;
     private static float originalShipSellPriceMult, originalShipBuyPriceMult, originalDModSellPriceMult;
     // A temporary list to hold our intel while the game is saving
-    private transient List<MarketConditionIntel> hiddenShipWeaponsIntel = new ArrayList<>();
-    private transient List<DeficitIntel> hiddenDeficitIntel = new ArrayList<>();
+    private transient List<ShipHullsWeaponsMarketIntel> hiddenShipWeaponsIntel = new ArrayList<>();
+    private transient List<DeficitTariffMarketIntel> backUpDeficitTariffMarketIntelForSaveGameCompatibility = new ArrayList<>();
     public static final String MOD_ID = "realistictariffs";
     private static final Logger log = Global.getLogger(RealisticTariffPlugin.class);
 
@@ -29,11 +29,11 @@ public class RealisticTariffPlugin extends BaseModPlugin {
     };
     private void setNormalTariffsAccordingToRTConfig(){
         //Set all submarket global tariffs to the normal value as define in the RTConfig
-        float LowestPossibleTariff = RTConfig.LowestPossibleTariff;
-        float targetTariff = RTConfig.NormalTariff;
+        float LowestPossibleTariff = RTConfig.lowestPossibleTariff;
+        float targetTariff = RTConfig.normalTariff;
 
         if (LowestPossibleTariff < 0)
-            LowestPossibleTariff = RTConfig.LowestPossibleTariff;
+            LowestPossibleTariff = RTConfig.lowestPossibleTariff;
 
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             // 3. Clean up any old modifiers from this mod to get a clean reading
@@ -56,20 +56,20 @@ public class RealisticTariffPlugin extends BaseModPlugin {
         //setNormalTariffsAccordingToRTConfig();
 
         hiddenShipWeaponsIntel = new ArrayList<>();
-        hiddenDeficitIntel = new ArrayList<>();
+        backUpDeficitTariffMarketIntelForSaveGameCompatibility = new ArrayList<>();
 
-        if(RTConfig.IsExportRebateActive) {
+        if(RTConfig.isExportRebateActive) {
             Global.getSector().addTransientListener(new RebateManager(false));
         }
 
-        if(RTConfig.IsFactionBuybackProgramActive) {
+        if(RTConfig.isFactionBuybackProgramActive) {
             Global.getSector().addTransientScript(new FactionShipBuyBack());
         }
 
         Global.getSector().addTransientScript(new TariffUpdater());
         Global.getSector().addTransientScript(new ShipTradeUIHook());
         Global.getSector().addTransientScript(new WeaponPriceUIHook());
-        Global.getSector().addTransientScript(new MarketConditionManager());
+        Global.getSector().addTransientScript(new ShipHullsWeaponIntelManager());
     }
 
     @Override
@@ -77,26 +77,26 @@ public class RealisticTariffPlugin extends BaseModPlugin {
         // 2. The game is about to save, hide the custom intel
         IntelManagerAPI intelManager = Global.getSector().getIntelManager();
         if (hiddenShipWeaponsIntel == null) hiddenShipWeaponsIntel = new ArrayList<>();
-        if (hiddenDeficitIntel == null) hiddenDeficitIntel = new ArrayList<>();
+        if (backUpDeficitTariffMarketIntelForSaveGameCompatibility == null) backUpDeficitTariffMarketIntelForSaveGameCompatibility = new ArrayList<>();
 
         hiddenShipWeaponsIntel.clear(); // Ensure our temporary list is empty
-        hiddenDeficitIntel.clear(); // Ensure our temporary list is empty
+        backUpDeficitTariffMarketIntelForSaveGameCompatibility.clear(); // Ensure our temporary list is empty
 
         // Find all our custom intel items currently active in the player's log
-        for (IntelInfoPlugin plugin : intelManager.getIntel(MarketConditionIntel.class)) {
-            hiddenShipWeaponsIntel.add((MarketConditionIntel) plugin);
+        for (IntelInfoPlugin plugin : intelManager.getIntel(ShipHullsWeaponsMarketIntel.class)) {
+            hiddenShipWeaponsIntel.add((ShipHullsWeaponsMarketIntel) plugin);
         }
 
-        for (IntelInfoPlugin plugin : intelManager.getIntel(DeficitIntel.class)) {
-            hiddenDeficitIntel.add((DeficitIntel) plugin);
+        for (IntelInfoPlugin plugin : intelManager.getIntel(DeficitTariffMarketIntel.class)) {
+            backUpDeficitTariffMarketIntelForSaveGameCompatibility.add((DeficitTariffMarketIntel) plugin);
         }
 
         // Remove them from the game's official manager so they don't get saved
-        for (MarketConditionIntel intelShipWeapons : hiddenShipWeaponsIntel) {
+        for (ShipHullsWeaponsMarketIntel intelShipWeapons : hiddenShipWeaponsIntel) {
             intelManager.removeIntel(intelShipWeapons);
         }
 
-        for (DeficitIntel intelDeficit : hiddenDeficitIntel) {
+        for (DeficitTariffMarketIntel intelDeficit : backUpDeficitTariffMarketIntelForSaveGameCompatibility) {
             intelManager.removeIntel(intelDeficit);
         }
 
@@ -140,23 +140,23 @@ public class RealisticTariffPlugin extends BaseModPlugin {
         IntelManagerAPI intelManager = Global.getSector().getIntelManager();
 
         if (hiddenShipWeaponsIntel != null) {
-            for (MarketConditionIntel intelArmament : hiddenShipWeaponsIntel) {
+            for (ShipHullsWeaponsMarketIntel intelArmament : hiddenShipWeaponsIntel) {
                 // Re-add quietly so it doesn't trigger the "New Intel" sound effect again
                 intelManager.addIntel(intelArmament, true);
             }
             hiddenShipWeaponsIntel.clear();
         }
 
-        if (hiddenDeficitIntel != null) {
-            for (DeficitIntel intelDeficit : hiddenDeficitIntel) {
+        if (backUpDeficitTariffMarketIntelForSaveGameCompatibility != null) {
+            for (DeficitTariffMarketIntel deficitTariffMarketIntel : backUpDeficitTariffMarketIntelForSaveGameCompatibility) {
                 // Re-add quietly so it doesn't trigger the "New Intel" sound effect again
-                intelManager.addIntel(intelDeficit, true);
+                intelManager.addIntel(deficitTariffMarketIntel, true);
             }
-            hiddenDeficitIntel.clear();
+            backUpDeficitTariffMarketIntelForSaveGameCompatibility.clear();
         }
 
         // Clear the list to free up memory
         hiddenShipWeaponsIntel.clear();
-        hiddenDeficitIntel.clear();
+        backUpDeficitTariffMarketIntelForSaveGameCompatibility.clear();
     }
 }

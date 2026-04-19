@@ -11,10 +11,10 @@ import com.fs.starfarer.api.util.Misc;
 import java.awt.Color;
 import java.util.Set;
 
-public class ShipHullsWeaponsIntel extends BaseMarketIntel {
+public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
     private final ShipHullsWeaponsIntelMarketCondition condition;
 
-    public ShipHullsWeaponsIntel(MarketAPI market, ShipHullsWeaponsIntelMarketCondition condition) {
+    public ShipHullsWeaponsMarketIntel(MarketAPI market, ShipHullsWeaponsIntelMarketCondition condition) {
         super(market);
         this.condition = condition;
     }
@@ -54,15 +54,15 @@ public class ShipHullsWeaponsIntel extends BaseMarketIntel {
         switch (condition) {
             case DEMAND_CRITICAL:
                 info.addPara("Ship sale prices have surged to %s and weapon prices to %s", pad, gray, highlight,
-                        formatTotal(RTConfig.ShipsDemandHighSellPriceBoost), formatTotal(RTConfig.WeaponsDemandHighSellPriceBoost));
+                        formatTotal(RTConfig.shipsDemandHighSellPriceBoost), formatTotal(RTConfig.weaponsDemandHighSellPriceBoost));
                 break;
             case DEMAND_MODERATE:
                 info.addPara("Ship sale prices have risen to %s and weapon prices to %s", pad, gray, highlight,
-                        formatTotal(RTConfig.ShipsDemandModerateSellPriceBoost), formatTotal(RTConfig.WeaponsDemandModerateSellPriceBoost));
+                        formatTotal(RTConfig.shipsDemandModerateSellPriceBoost), formatTotal(RTConfig.weaponsDemandModerateSellPriceBoost));
                 break;
             case DEMAND_MINOR:
                 info.addPara("Ship sale prices have increased by %s and weapon prices by %s", pad, gray, highlight,
-                        formatBoost(RTConfig.ShipsDemandMinorSellPriceBoost), formatBoost(RTConfig.WeaponsDemandMinorSellPriceBoost));
+                        formatBoost(RTConfig.shipsDemandMinorSellPriceBoost), formatBoost(RTConfig.weaponsDemandMinorSellPriceBoost));
                 break;
             case WAR_MULTIPLE:
                 info.addPara("The expansion of %s's conflicts has further increased military prices", pad, gray, highlight, fName);
@@ -93,51 +93,51 @@ public class ShipHullsWeaponsIntel extends BaseMarketIntel {
                 info.addPara("%s is experiencing a critical shortage of both ships and military-grade weaponry. Fleet losses, " +
                         "logistical strain, and heightened demand have driven prices sharply upward, creating highly profitable opportunities " +
                         "for independent traders willing to supply the market.", opad, faction.getBaseUIColor(), mName);
-                addTradeBullets(info, pad, h, RTConfig.ShipsDemandHighSellPriceBoost, RTConfig.WeaponsDemandHighSellPriceBoost, RTConfig.ShipsDemandHighBuyPriceBoost, RTConfig.WeaponsDemandHighBuyPriceBoost, faction.getId());
+                addTradeBullets(info, pad, h, RTConfig.shipsDemandHighSellPriceBoost, RTConfig.weaponsDemandHighSellPriceBoost, RTConfig.shipsDemandHighBuyPriceBoost, RTConfig.weaponsDemandHighBuyPriceBoost, faction.getId());
                 break;
 
             case DEMAND_MODERATE:
                 info.addPara("%s is currently facing a notable deficit in ships and ship-mounted weaponry. Ongoing demand has begun to outpace " +
                         "supply, pushing market prices upward and creating favorable conditions for traders supplying military assets.",
                         opad, faction.getBaseUIColor(), mName);
-                addTradeBullets(info, pad, h, RTConfig.ShipsDemandModerateSellPriceBoost, RTConfig.WeaponsDemandModerateSellPriceBoost, RTConfig.ShipsDemandModerateBuyPriceBoost, RTConfig.WeaponsDemandModerateBuyPriceBoost, faction.getId());
+                addTradeBullets(info, pad, h, RTConfig.shipsDemandModerateSellPriceBoost, RTConfig.weaponsDemandModerateSellPriceBoost, RTConfig.shipsDemandModerateBuyPriceBoost, RTConfig.weaponsDemandModerateBuyPriceBoost, faction.getId());
                 break;
 
             case DEMAND_MINOR:
                 info.addPara("%s is experiencing a mild shortage of ships and associated weaponry. While not critical, the reduced " +
                         "supply has led to a modest increase in both selling and purchasing prices, offering limited but reliable trade opportunities.",
                         opad, faction.getBaseUIColor(), mName);
-                addTradeBullets(info, pad, h, RTConfig.ShipsDemandMinorSellPriceBoost, RTConfig.WeaponsDemandMinorSellPriceBoost, RTConfig.ShipsDemandMinorBuyPriceBoost, RTConfig.WeaponsDemandMinorBuyPriceBoost, faction.getId());
+                addTradeBullets(info, pad, h, RTConfig.shipsDemandMinorSellPriceBoost, RTConfig.weaponsDemandMinorSellPriceBoost, RTConfig.shipsDemandMinorBuyPriceBoost, RTConfig.weaponsDemandMinorBuyPriceBoost, faction.getId());
                 break;
 
             case WAR_MULTIPLE:
                 info.addPara("%s is now engaged across multiple fronts, stretching its logistical and industrial capacity to the limit. The escalating " +
                         "demand for ships and weapon systems has driven military market prices to unprecedented levels.",
                         opad, faction.getBaseUIColor(), fName);
-                addTradeBullets(info, pad, h, RTConfig.ShipMultipleWarsPricesBonus, RTConfig.WeaponsMultipleWarsPricesBonus, RTConfig.ShipMultipleWarsPricesBonus, RTConfig.WeaponsMultipleWarsPricesBonus, faction.getId());
+                addTradeBullets(info, pad, h, RTConfig.shipMultipleWarsPricesBonus, RTConfig.weaponsMultipleWarsPricesBonus, RTConfig.shipMultipleWarsPricesBonus, RTConfig.weaponsMultipleWarsPricesBonus, faction.getId());
                 break;
 
             case WAR_SINGLE:
                 info.addPara("The escalating conflict between %s and its adversary has begun to strain military supply chains. As demand for ships " +
                         "and weapons intensifies, market prices have risen accordingly across affected systems.",
                         opad, faction.getBaseUIColor(), fName);
-                addTradeBullets(info, pad, h, RTConfig.ShipWarPricesBonus, RTConfig.WeaponsWarPricesBonus, RTConfig.ShipWarPricesBonus, RTConfig.WeaponsWarPricesBonus, faction.getId());
+                addTradeBullets(info, pad, h, RTConfig.shipWarPricesBonus, RTConfig.weaponsWarPricesBonus, RTConfig.shipWarPricesBonus, RTConfig.weaponsWarPricesBonus, faction.getId());
                 break;
             case FACTION_BUYBACK_HEGEMONY:
                 info.addPara("With war placing increasing pressure on fleet strength, %s has initiated a ship buyback program to recover and redeploy " +
                         "its own designs. Captains willing to sell compatible vessels will receive additional compensation as part of this effort in " +
                         "particularly for those belonging to the XIV Battlegroup.",
                         opad, faction.getBaseUIColor(), fName);
-                info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.FactionShipSellBonus));
-                info.addPara(" %s Selling XIV Battlegroup Ships", 0f, h, formatBoost(RTConfig.ExoticShipSellPriceBonus));
+                info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.factionShipSellBonus));
+                info.addPara(" %s Selling XIV Battlegroup Ships", 0f, h, formatBoost(RTConfig.exoticShipSellPriceBonus));
                 break;
             case FACTION_BUYBACK_LUDDICPATH, FACTION_BUYBACK_LUDDICCHURCH, FACTION_BUYBACK_TRITACHYON:
                 info.addPara("With war placing increasing pressure on fleet strength, %s has initiated a ship buyback program to recover and redeploy" +
                         " its own designs. Captains willing to sell compatible vessels will receive additional compensation as part of this effort.",
                         opad, faction.getBaseUIColor(), fName);
-                info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.FactionShipSellBonus));
+                info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.factionShipSellBonus));
                 if(Factions.DIKTAT == faction.getId()){
-                    info.addPara(" %s Selling Lion's Guard Ships", 0f, h, formatBoost(RTConfig.ExoticShipSellPriceBonus));
+                    info.addPara(" %s Selling Lion's Guard Ships", 0f, h, formatBoost(RTConfig.exoticShipSellPriceBonus));
                 }
                 break;
         }

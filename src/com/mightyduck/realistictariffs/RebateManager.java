@@ -6,6 +6,7 @@ import com.fs.starfarer.api.campaign.CargoStackAPI;
 import com.fs.starfarer.api.campaign.PlayerMarketTransaction;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.SubmarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Sounds;
 import com.fs.starfarer.api.impl.campaign.ids.Submarkets;
 
 import java.awt.Color;
@@ -71,6 +72,12 @@ public class RebateManager extends BaseCampaignEventListener {
                 (int) (currentTariff * 100));
 
         Global.getSector().getCampaignUI().addMessage(message, Color.GREEN);
-        Global.getSoundPlayer().playUISound("ui_rep_raise", 1f, 1f);
+
+        try {
+            Global.getSoundPlayer().playUISound("rt_exporters_rebate", 1f, 1f);
+        } catch (Exception e) {
+            // If the sound fails, the game won't crash. We just log it so you know to fix it later.
+            Global.getLogger(RebateManager.class).error("Failed to play rebate UI sound!", e);
+        }
     }
 }
