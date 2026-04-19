@@ -1,7 +1,5 @@
 {
-  "ui": {
-    "rt_exporters_rebate": {
-      "sounds": [ "rt_exporters_rebate.ogg" ]
-    }
-  }
+  "rt_exporters_rebate": [
+    {"file":"sounds/ui/rt_exporters_rebate.ogg","pitch":1,"volume":1}
+  ]
 }
