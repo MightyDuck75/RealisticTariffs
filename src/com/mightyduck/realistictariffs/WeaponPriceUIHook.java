@@ -8,7 +8,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import org.apache.log4j.Logger;
 
 public class WeaponPriceUIHook implements EveryFrameScript {
-    private boolean initialized = false;
+
     private static final Logger log = Global.getLogger(WeaponPriceUIHook.class);
 
     @Override
@@ -38,14 +38,6 @@ public class WeaponPriceUIHook implements EveryFrameScript {
         if ( currentWeaponSellPriceMul != sellWeaponMult)
             Global.getSettings().setFloat("shipWeaponSellPriceMult", RealisticTariffPlugin.getOriginalWeaponSellMult() + sellWeaponMult);
 
-//        WeaponPriceUIHook.log.info("WeaponPriceUIHook: shipWeaponBuyPriceMult : " + (RealisticTariffPlugin.getOriginalWeaponBuyMult() + buyWeaponMult) +
-//                " shipWeaponSellPriceMult : "+ (RealisticTariffPlugin.getOriginalWeaponSellMult() + sellWeaponMult) +
-//                " buyWeaponMult  "+ buyWeaponMult +
-//                " sellWeaponMult  "+ sellWeaponMult +
-//                " current WeaponBuy" + Global.getSettings().getFloat("shipWeaponBuyPriceMult") +
-//                " current WeaponSell" +  Global.getSettings().getFloat("shipWeaponSellPriceMult") +
-//                " Market " + market.getId()
-//        );
     }
 
     private void resetToVanilla() {

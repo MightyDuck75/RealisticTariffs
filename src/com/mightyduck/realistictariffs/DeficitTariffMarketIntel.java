@@ -17,7 +17,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
     private final Color intelTitleBlueColor, goldColor, grayColor;
 
     private List<String> mapLegalCommoditiesDeficit = new ArrayList<>();
-    private final List<String> mapIllegalCommoditiesDeficit = new ArrayList<>();
+    private List<String> mapIllegalCommoditiesDeficit = new ArrayList<>();
 
     private final List<String> Eco_Commodities = Arrays.asList(
             Commodities.SHIPS, Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
@@ -48,6 +48,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
         if (tariff <= RTConfig.criticalTariffThreshold) {
             return "Critical Shortages in " + market.getName();
         }
+
         if (tariff > RTConfig.criticalTariffThreshold && tariff <= RTConfig.severeTariffThreshold) {
             return "Severe Shortages in " + market.getName();
         }

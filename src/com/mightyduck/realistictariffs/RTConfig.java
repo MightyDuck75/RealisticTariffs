@@ -69,6 +69,9 @@ public class RTConfig {
 
             normalTariff = (float) tariffs.optDouble("normalTariff", 0.18);
             lowestPossibleTariff = (float) tariffs.optDouble("lowestPossibleTariff", 0.03);
+            if (lowestPossibleTariff < 0)
+                lowestPossibleTariff = 0.03f;
+
             criticalTariffThreshold = (float) tariffs.optDouble("criticalTariffThreshold", 0.09);
             severeTariffThreshold = (float) tariffs.optDouble("severeTariffThreshold", 0.14);
             intelTriggerThreshold = tariffs.optInt("numberOfCommoditiesInDeficitToTriggerIntel", 1);

@@ -58,11 +58,11 @@ public class TariffUpdater implements EveryFrameScript {
                 }
             }
 
-            // --- 2. MANAGE INTEL ---
-            handleIntel(market, totalShortages, activeIntelList);
-
             // --- 3. APPLY TARIFFS ---
             applyTariffChanges(market, sumTariffReduction);
+
+            // --- 2. MANAGE INTEL ---
+            handleIntel(market, totalShortages, activeIntelList);
         }
     }
 
@@ -112,17 +112,17 @@ public class TariffUpdater implements EveryFrameScript {
             setTariffsToNormal = RTConfig.normalTariff - market.getTariff().getModifiedValue();
 
         // 4. Calculate how much we need to add/subtract to reach 0.18
-        float current = market.getTariff().getModifiedValue();
+        float currentTariff = market.getTariff().getModifiedValue();
 
         // 2. Calculate the "Potential" new tariff
-        float potentialTariff = current - (Math.abs(setTariffsToNormal) + tariffReduction) ;
+        float potentialTariff = currentTariff - (Math.abs(setTariffsToNormal) + tariffReduction) ;
 
         // 3. Apply the Floor (The Math)
         // Math.max returns the LARGER of the two numbers.
         float finalTargetTariff = Math.max(potentialTariff, RTConfig.lowestPossibleTariff);
 
         // 4. Calculate the required Flat Modifier
-        float finalAdjustment = finalTargetTariff - current;
+        float finalAdjustment = finalTargetTariff - currentTariff;
 
         // 5. Apply the change
         // We only apply it if the adjustment isn't 0 (to keep the UI clean)
