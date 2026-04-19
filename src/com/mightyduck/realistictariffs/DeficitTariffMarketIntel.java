@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class DeficitIntel extends BaseMarketIntel {
+public class MarketDeficitTariffIntel extends BaseMarketIntel {
     private int countIllegalGoods = 0, countNormalGoods = 0;
     private Boolean hasOnlyIllegalGoodsDemand;
     private final Color intelTitleBlueColor, goldColor, grayColor;
@@ -27,7 +27,7 @@ public class DeficitIntel extends BaseMarketIntel {
             Commodities.VOLATILES
     );
 
-    public DeficitIntel(MarketAPI market) {
+    public MarketDeficitTariffIntel(MarketAPI market) {
         super(market);
         intelTitleBlueColor = Misc.getBasePlayerColor();
         goldColor = Misc.getHighlightColor();
@@ -45,10 +45,10 @@ public class DeficitIntel extends BaseMarketIntel {
 
         float tariff = market.getTariff().getModifiedValue();
 
-        if (tariff <= 0.09f) {
+        if (tariff <= RTConfig.CriticalTariffThreshold) {
             return "Critical Shortages in " + market.getName();
         }
-        if (tariff > 0.09f && tariff <= 0.14f ) {
+        if (tariff > RTConfig.CriticalTariffThreshold && tariff <= RTConfig.SevereTariffThreshold ) {
             return "Severe Shortages in " + market.getName();
         }
 
@@ -103,9 +103,9 @@ public class DeficitIntel extends BaseMarketIntel {
 
         float tariff = market.getTariff().getModifiedValue();
 
-        if (tariff <= 0.09f && !hasOnlyIllegalGoodsDemand)
+        if (tariff <= RTConfig.CriticalTariffThreshold && !hasOnlyIllegalGoodsDemand)
             tags.add(Tags.INTEL_IMPORTANT);
-        if (tariff > 0.09f || countIllegalGoods >= 1)
+        if (tariff > RTConfig.CriticalTariffThreshold || countIllegalGoods >= 1)
             tags.add(Tags.INTEL_TRADE);
 
         return tags;

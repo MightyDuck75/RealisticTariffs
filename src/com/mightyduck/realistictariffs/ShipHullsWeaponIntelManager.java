@@ -13,7 +13,7 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import java.util.*;
 import java.util.List;
 
-public class MarketConditionManager implements EveryFrameScript {
+public class ShipsHullWeaponIntelManager implements EveryFrameScript {
     private final IntervalUtil tracker = new IntervalUtil(1f, 1f); // Check once per day
 
     // Define which factions have specific/elite ships for the buyback programs
@@ -51,14 +51,14 @@ public class MarketConditionManager implements EveryFrameScript {
             if (market.isHidden() || market.getFaction().isPlayerFaction()) continue;
 
             boolean isRepresentative = (market == representativeMarkets.get(market.getFactionId()));
-            List<MarketCondition> conditionsForThisMarket = determineConditions(market, isRepresentative);
+            List<ShipHullsWeaponsIntelMarketCondition> conditionsForThisMarket = determineConditions(market, isRepresentative);
 
             syncIntelForMarket(market, conditionsForThisMarket);
         }
     }
 
-    private List<MarketCondition> determineConditions(MarketAPI market, boolean isRepresentative) {
-        List<MarketCondition> conditions = new ArrayList<>();
+    private List<ShipHullsWeaponsIntelMarketCondition> determineConditions(MarketAPI market, boolean isRepresentative) {
+        List<ShipHullsWeaponsIntelMarketCondition> conditions = new ArrayList<>();
         FactionAPI faction = market.getFaction();
         String fId = faction.getId();
         CommodityOnMarketAPI ships = market.getCommodityData(Commodities.SHIPS);
@@ -66,31 +66,31 @@ public class MarketConditionManager implements EveryFrameScript {
         // 1. Ship Deficit Logic
         int shipDeficit = ships.getMaxDemand() - ships.getAvailable();
 
-        if (shipDeficit >= 3) conditions.add(MarketCondition.DEMAND_CRITICAL);
-        else if (shipDeficit == 2) conditions.add(MarketCondition.DEMAND_MODERATE);
-        else if (shipDeficit == 1) conditions.add(MarketCondition.DEMAND_MINOR);
+        if (shipDeficit >= 3) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL);
+        else if (shipDeficit == 2) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_MODERATE);
+        else if (shipDeficit == 1) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_MINOR);
 
         // 2. War Logic
         if (isRepresentative && !fId.equals(Factions.PIRATES) && !fId.equals(Factions.LUDDIC_PATH)){
             int activeWars = getActiveWarCount(market.getFaction());
 
             if (activeWars > 1) {
-                conditions.add(MarketCondition.WAR_MULTIPLE);
+                conditions.add(ShipHullsWeaponsIntelMarketCondition.WAR_MULTIPLE);
             } else if (activeWars == 1) {
-                conditions.add(MarketCondition.WAR_SINGLE);
+                conditions.add(ShipHullsWeaponsIntelMarketCondition.WAR_SINGLE);
             }
 
             // Buyback program
             if (activeWars > 0 && (!fId.equals(Factions.PERSEAN) || !fId.equals(Factions.DIKTAT))) {
                 switch(fId) {
                     case Factions.HEGEMONY:
-                        if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(MarketCondition.FACTION_BUYBACK_HEGEMONY);
+                        if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(ShipHullsWeaponsIntelMarketCondition.FACTION_BUYBACK_HEGEMONY);
                         break;
                     case Factions.LUDDIC_CHURCH:
-                        if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(MarketCondition.FACTION_BUYBACK_LUDDICCHURCH);
+                        if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(ShipHullsWeaponsIntelMarketCondition.FACTION_BUYBACK_LUDDICCHURCH);
                         break;
                     case Factions.TRITACHYON:
-                        if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(MarketCondition.FACTION_BUYBACK_TRITACHYON);
+                        if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(ShipHullsWeaponsIntelMarketCondition.FACTION_BUYBACK_TRITACHYON);
                         break;
                 }
             }
@@ -98,34 +98,34 @@ public class MarketConditionManager implements EveryFrameScript {
         return conditions;
     }
 
-    private void syncIntelForMarket(MarketAPI market, List<MarketCondition> activeConditions) {
+    private void syncIntelForMarket(MarketAPI market, List<ShipHullsWeaponsIntelMarketCondition> activeConditions) {
         // Find all existing intel for this market currently displayed to the player
-        List<MarketConditionIntel> existingIntel = new ArrayList<>();
-        for (IntelInfoPlugin plugin : Global.getSector().getIntelManager().getIntel(MarketConditionIntel.class)) {
-            MarketConditionIntel intel = (MarketConditionIntel) plugin;
+        List<ShipHullsWeaponsIntel> existingIntel = new ArrayList<>();
+        for (IntelInfoPlugin plugin : Global.getSector().getIntelManager().getIntel(ShipHullsWeaponsIntel.class)) {
+            ShipHullsWeaponsIntel intel = (ShipHullsWeaponsIntel) plugin;
             if (intel.getMarket() == market && !intel.isEnding() && !intel.isEnded()) {
                 existingIntel.add(intel);
             }
         }
 
         // Clean up conditions that are no longer true
-        for (MarketConditionIntel intel : existingIntel) {
+        for (ShipHullsWeaponsIntel intel : existingIntel) {
             if (!activeConditions.contains(intel.getCondition())) {
                 intel.endAfterDelay(); // Gracefully archives the intel before removal
             }
         }
 
         // Create new intel for conditions that just started
-        for (MarketCondition condition : activeConditions) {
+        for (ShipHullsWeaponsIntelMarketCondition condition : activeConditions) {
             boolean exists = false;
-            for (MarketConditionIntel intel : existingIntel) {
+            for (ShipHullsWeaponsIntel intel : existingIntel) {
                 if (intel.getCondition() == condition) {
                     exists = true;
                     break;
                 }
             }
             if (!exists) {
-                Global.getSector().getIntelManager().addIntel(new MarketConditionIntel(market, condition));
+                Global.getSector().getIntelManager().addIntel(new ShipHullsWeaponsIntel(market, condition));
             }
         }
     }

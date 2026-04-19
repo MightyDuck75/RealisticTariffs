@@ -11,15 +11,15 @@ import com.fs.starfarer.api.util.Misc;
 import java.awt.Color;
 import java.util.Set;
 
-public class MarketConditionIntel extends BaseMarketIntel {
-    private final MarketCondition condition;
+public class ShipHullsWeaponsIntel extends BaseMarketIntel {
+    private final ShipHullsWeaponsIntelMarketCondition condition;
 
-    public MarketConditionIntel(MarketAPI market, MarketCondition condition) {
+    public ShipHullsWeaponsIntel(MarketAPI market, ShipHullsWeaponsIntelMarketCondition condition) {
         super(market);
         this.condition = condition;
     }
 
-    public MarketCondition getCondition() {
+    public ShipHullsWeaponsIntelMarketCondition getCondition() {
         return condition;
     }
 
@@ -165,9 +165,9 @@ public class MarketConditionIntel extends BaseMarketIntel {
 
     @Override
     public boolean isImportant() {
-        return condition == MarketCondition.DEMAND_CRITICAL ||
-                condition == MarketCondition.DEMAND_MODERATE ||
-                condition == MarketCondition.WAR_MULTIPLE;
+        return condition == ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL ||
+                condition == ShipHullsWeaponsIntelMarketCondition.DEMAND_MODERATE ||
+                condition == ShipHullsWeaponsIntelMarketCondition.WAR_MULTIPLE;
     }
 
     // --- Format Helpers ---
