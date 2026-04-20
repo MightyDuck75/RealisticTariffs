@@ -207,11 +207,14 @@ public class FactionShipBuyBack implements EveryFrameScript{
 
         CustomRepImpact impact = new CustomRepImpact();
         impact.delta = repAmount; // Starsector rep scales from -1.0 to 1.0 internally
+        String repMessage = "- Change caused by selling a faction ship back to its faction";
+        Color factionColor = Global.getSector().getFaction(factionId).getBaseUIColor();
 
         Global.getSector().adjustPlayerReputation(
-                new RepActionEnvelope(RepActions.CUSTOM, impact, null, null, true),
+                new RepActionEnvelope(RepActions.CUSTOM, impact, null, null, false),
                 factionId
         );
+        Global.getSector().getCampaignUI().addMessage(repMessage, factionColor);
     }
 
     private String getFactionOfRareFactionalShip(FleetMemberAPI ship) {
