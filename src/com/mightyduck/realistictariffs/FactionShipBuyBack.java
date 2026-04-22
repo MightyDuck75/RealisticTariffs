@@ -11,6 +11,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.SubmarketAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.impl.campaign.DModManager;
 import com.fs.starfarer.api.impl.campaign.ids.Submarkets;
@@ -24,7 +25,10 @@ import static com.fs.starfarer.api.impl.campaign.ids.Submarkets.SUBMARKET_STORAG
 public class FactionShipBuyBack implements EveryFrameScript{
     private boolean wasInMarket = false;
     private MarketAPI currentMarket = null;
+    private float exoticShipRepGain = 0f, factionShipRepGain = 0f;
+    private float exoticShipRepLoss = 0f, factionShipRepLoss = 0f;
 
+    private float reputation = 0f;
     // Tracks the state of the player's fleet to safely detect sold ships
     private final Map<String, FleetMemberAPI> currentFleetThatEntersMarket = new HashMap<>();
 
@@ -61,6 +65,11 @@ public class FactionShipBuyBack implements EveryFrameScript{
             wasInMarket = true;
 
         } else if (!inMarket && wasInMarket) {
+            exoticShipRepGain = RTConfig.exoticShipSaleReputationGain;
+            exoticShipRepLoss = RTConfig.exoticShipSaleReputationLoss;
+            factionShipRepGain = RTConfig.factionShipSaleReputationGain;
+            factionShipRepLoss = RTConfig.factionShipSaleReputationLoss;
+
             // 2. DIALOG CLOSES: Compare and Calculate
             // Build a quick HashSet of the player's CURRENT fleet IDs for instant lookup
             Set<String> postTradeFleetIds = new HashSet<>();
@@ -149,8 +158,6 @@ public class FactionShipBuyBack implements EveryFrameScript{
                 }
             } else {
                 // Sold to OTHER faction market
-                FactionShipBuyBack.log.info("marketFactionId: " + marketFactionId + " Ship Design Faction(regularFactionId): " + regularFactionId);
-
                 if (isEnemyMarket) {
                     accumulateRep(regularFactionalShipBuybackRepChanges, regularFactionId, RTConfig.factionShipSaleReputationLoss);
                 }
@@ -162,27 +169,15 @@ public class FactionShipBuyBack implements EveryFrameScript{
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
         Color highlightColor = Misc.getHighlightColor();
         Color textBaseColor = Misc.getTextColor();
+        String creditsStr = "";
 
-        // Exotic/Rare Ships like XIV Battlegroup
-        if (rareFactionalShipBonusCredits > 0 || !rareFactionalShipBuybackRepChanges.isEmpty()) {
-            if (rareFactionalShipBonusCredits > 0) {
-                playerFleet.getCargo().getCredits().add(rareFactionalShipBonusCredits);
-            }
-            for (Map.Entry<String, Float> entry : rareFactionalShipBuybackRepChanges.entrySet()) {
-                applyReputation(entry.getKey(), entry.getValue());
-            }
-
-            String creditsStr = Misc.getDGSCredits(rareFactionalShipBonusCredits);
-            Global.getSector().getCampaignUI().getMessageDisplay().addMessage(
-                    "Ship Buyback Program: The faction thanks you for returning advance ships and rewards you with " + creditsStr + " bonus credits.",
-                    textBaseColor, creditsStr, highlightColor
-            );
-        }
 
         // --- Process Regular Rewards ---
         if (regularFactionShipBonusCredits > 0 || !regularFactionalShipBuybackRepChanges.isEmpty()) {
             if (regularFactionShipBonusCredits > 0) {
                 playerFleet.getCargo().getCredits().add(regularFactionShipBonusCredits);
+                creditsStr = Misc.getDGSCredits(rareFactionalShipBonusCredits);
+
             }
             for (Map.Entry<String, Float> entry : regularFactionalShipBuybackRepChanges.entrySet()) {
                 applyReputation(entry.getKey(), entry.getValue());
@@ -190,15 +185,59 @@ public class FactionShipBuyBack implements EveryFrameScript{
 
             // Only show credit message if credits were actually awarded (since sometimes it's rep only)
             if (regularFactionShipBonusCredits > 0) {
-                String creditsStr = Misc.getDGSCredits(regularFactionShipBonusCredits);
-                Global.getSector().getCampaignUI().addMessage("Ship Buyback Program: Local authorities issued a rebate of " + creditsStr + " credits for selling faction hulls.", textBaseColor );
+                creditsStr = "+"+Misc.getDGSCredits(regularFactionShipBonusCredits);
+                String notificationTitle = "Ship Buyback Program ";
+                String intelMessage = creditsStr + " transferred as compensation";
+
+                String sectionHeadingText = "The faction "+ currentMarket.getFaction().getDisplayName() + " recognizes your contribution and compensates you for " +
+                        "helping the war effort.";
+                String sectionHeadingLabel = "Transaction Details";
+                String reputationDetail = "+"+(int)(reputation*100);
+
+                List<ExpandedParagraphForIntel> details = Arrays.asList(
+                        new ExpandedParagraphForIntel("Faction: "+ currentMarket.getFaction().getDisplayName(), currentMarket.getFaction().getDisplayName(), currentMarket.getFaction().getBaseUIColor()),
+                        new ExpandedParagraphForIntel("Bonus Credits: " + creditsStr, creditsStr, Misc.getHighlightColor()),
+                        new ExpandedParagraphForIntel("Reputation Change: " + reputationDetail ,reputationDetail, Misc.getPositiveHighlightColor())
+                );
+
+                IntelMessageNotification intel = new IntelMessageNotification(
+                        notificationTitle,
+                        intelMessage,
+                        new String[]{ creditsStr },
+                        new Color[]{Misc.getHighlightColor() },
+                        "Ship Buyback Program",
+                        details,
+                        currentMarket.getFaction().getId(),
+                        currentMarket,
+                        sectionHeadingText,
+                        Misc.getGrayColor(),
+                        sectionHeadingLabel,
+                        "icons",
+                        "rt_rebate_icon",
+                        Tags.INTEL_LOCAL
+                );
+
+                Global.getSector().getIntelManager().addIntel(intel, false);
+                intel.endAfterDelay(4f);
 
             } else {
-                Global.getSector().getCampaignUI().getMessageDisplay().addMessage(
+                Global.getSector().getCampaignUI().addMessage(
                         "Local government thanks you for conducting faction ship sales inside their markets.",
                         textBaseColor
                 );
+
             }
+
+            // Exotic/Rare Ships like XIV Battlegroup
+            if (rareFactionalShipBonusCredits > 0 || !rareFactionalShipBuybackRepChanges.isEmpty()) {
+                if (rareFactionalShipBonusCredits > 0) {
+                    playerFleet.getCargo().getCredits().add(rareFactionalShipBonusCredits);
+                }
+                for (Map.Entry<String, Float> entry : rareFactionalShipBuybackRepChanges.entrySet()) {
+                    applyReputation(entry.getKey(), entry.getValue());
+                }
+            }
+
         }
     }
 
@@ -206,15 +245,13 @@ public class FactionShipBuyBack implements EveryFrameScript{
         if (repAmount == 0f) return;
 
         CustomRepImpact impact = new CustomRepImpact();
+        reputation = repAmount;
         impact.delta = repAmount; // Starsector rep scales from -1.0 to 1.0 internally
-        String repMessage = "- Change caused by selling a faction ship back to its faction";
-        Color factionColor = Global.getSector().getFaction(factionId).getBaseUIColor();
 
         Global.getSector().adjustPlayerReputation(
                 new RepActionEnvelope(RepActions.CUSTOM, impact, null, null, false),
                 factionId
         );
-        Global.getSector().getCampaignUI().addMessage(repMessage, factionColor);
     }
 
     private String getFactionOfRareFactionalShip(FleetMemberAPI ship) {

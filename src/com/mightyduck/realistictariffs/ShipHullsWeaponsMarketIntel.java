@@ -29,10 +29,10 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
         String mName = market.getName();
 
         switch (condition) {
-            case DEMAND_CRITICAL: return "Critical Shortage of Ships and Armaments in " + mName;
-            case DEMAND_MODERATE: return "Moderate Shortage of Ships and Armaments in " + mName;
-            case DEMAND_MINOR: return "Minor Shortage of Ships and Armaments in " + mName;
-            case WAR_MULTIPLE: return "Multi-Front War Drives Military Prices Skyward";
+            case DEMAND_CRITICAL: return "Critical Shortage of Ships & Armaments in " + mName;
+            case DEMAND_MODERATE: return "Moderate Shortage of Ships & Armaments in " + mName;
+            case DEMAND_MINOR: return "Minor Shortage of Ships & Armaments in " + mName;
+            case WAR_MULTIPLE: return "Multi-Front War Drives Military Prices";
             case WAR_SINGLE: return "War-Driven Military Price Inflation";
             case FACTION_BUYBACK_HEGEMONY, FACTION_BUYBACK_LUDDICPATH, FACTION_BUYBACK_LUDDICCHURCH, FACTION_BUYBACK_TRITACHYON:
                 return fName + " Ship Buyback Initiative";
@@ -65,7 +65,7 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
                         formatBoost(RTConfig.shipsDemandMinorSellPriceBoost), formatBoost(RTConfig.weaponsDemandMinorSellPriceBoost));
                 break;
             case WAR_MULTIPLE:
-                info.addPara("The expansion of %s's conflicts has further increased military prices", pad, gray, highlight, fName);
+                info.addPara("The expansion of %s's conflicts has further increased military prices", pad, gray, market.getFaction().getBaseUIColor(), fName);
                 break;
             case WAR_SINGLE:
                 info.addPara("Ongoing conflict has increased ship and weapon prices across faction markets", gray,pad);

@@ -137,7 +137,7 @@ public class RealisticTariffPlugin extends BaseModPlugin {
         if (backUpShipWeaponsIntelForSaveCompatibility != null) {
             for (ShipHullsWeaponsMarketIntel intelArmament : backUpShipWeaponsIntelForSaveCompatibility) {
                 // Re-add quietly so it doesn't trigger the "New Intel" sound effect again
-                intelManager.addIntel(intelArmament, true);
+                intelManager.addIntel(intelArmament, false);
             }
             backUpShipWeaponsIntelForSaveCompatibility.clear();
         }
@@ -145,7 +145,7 @@ public class RealisticTariffPlugin extends BaseModPlugin {
         if (backUpDeficitTariffMarketIntelForGameCompatibility != null) {
             for (DeficitTariffMarketIntel deficitTariffMarketIntel : backUpDeficitTariffMarketIntelForGameCompatibility) {
                 // Re-add quietly so it doesn't trigger the "New Intel" sound effect again
-                intelManager.addIntel(deficitTariffMarketIntel, true);
+                intelManager.addIntel(deficitTariffMarketIntel, false);
             }
             backUpDeficitTariffMarketIntelForGameCompatibility.clear();
         }

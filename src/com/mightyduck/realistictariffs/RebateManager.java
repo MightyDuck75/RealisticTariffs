@@ -7,10 +7,13 @@ import com.fs.starfarer.api.campaign.PlayerMarketTransaction;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.SubmarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Submarkets;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.util.Misc;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RebateManager extends BaseCampaignEventListener {
@@ -76,31 +79,50 @@ public class RebateManager extends BaseCampaignEventListener {
         int creditsInt = (int) rebateAmount;
         int tariffInt = (int) (currentTariff * 100);
 
-        String header = "Exporter Rebate:";
-        String creditsStr = String.format("%,d credits", creditsInt);
+        String header = "Exporter Rebate";
+        String creditsStr ="+" + Misc.getDGSCredits(creditsInt);
         String marketName = market.getName();
         String tariffSmall = String.valueOf(tariffInt);
 
-        String fullText = String.format("%s %s returned from %s trade authorities",
-                header, creditsStr, marketName);
+        String fullText = String.format("%s returned from %s trade authorities",
+                creditsStr, marketName);
 
-        String[] highlights = new String[]{header, creditsStr, marketName};
-        Color[] colors = new Color[]{
-                Misc.getBasePlayerColor(),       // Light Blue
-                Misc.getHighlightColor(),        // Yellow
-                market.getFaction().getBaseUIColor(), // Faction Color
-                Misc.getGrayColor()              // Gray
-        };
+        String sectionHeadingText = "As a trader, you are entitled to commodity export rebates. " +
+                "These rebates are issued to incentivize legal trade and are processed " +
+                "automatically upon transaction completion at authorized markets.";
+        String sectionHeadingLabel = "Transaction Details";
+        String transactionTotalValue = "+" + Misc.getDGSCredits((int)transactionTotal);
 
-        // 1. Create the Intel
-        IntelMessageNotification intel = new IntelMessageNotification(fullText, highlights, colors, market, creditsStr, tariffSmall, transactionTotal);
+        List<ExpandedParagraphForIntel> details = Arrays.asList(
+                new ExpandedParagraphForIntel("Market: "+ market.getName(), market.getName(), market.getFaction().getBaseUIColor()),
+                new ExpandedParagraphForIntel("Faction: "+ market.getFaction().getDisplayName(), market.getFaction().getDisplayName(), market.getFaction().getBaseUIColor()),
+                new ExpandedParagraphForIntel("Transaction Value: "+ transactionTotalValue, "" + transactionTotalValue, Misc.getHighlightColor()),
+                new ExpandedParagraphForIntel("Tariff Rate: " + ""+ tariffSmall + "%%", ""+tariffSmall + "%%", Misc.getHighlightColor()),
+                new ExpandedParagraphForIntel("Total Rebate: "+ creditsStr, ""+creditsStr, Misc.getHighlightColor())
+        );
 
-        // 2. Add it to the manager. 'false' means "Send a notification popup"
+        IntelMessageNotification intel = new IntelMessageNotification(
+                header,
+                fullText,
+                new String[]{ creditsStr, market.getName()},
+                new Color[]{Misc.getHighlightColor(), market.getFaction().getBaseUIColor()},
+                "Tariff Rebate Issued",
+                details,
+                market.getFaction().getId(),
+                market,
+                sectionHeadingText,
+                Misc.getGrayColor(),
+                sectionHeadingLabel,
+                "icons",
+                "rt_rebate_icon",
+                Tags.INTEL_LOCAL
+        );
+
         Global.getSector().getIntelManager().addIntel(intel, false);
 
         // 3. IMPORTANT: Set a longer delay.
         // This gives the player time to see it before it is moved to "History"
-        intel.endAfterDelay(5f);
+        intel.endAfterDelay(4f);
 
         try {
             Global.getSoundPlayer().playUISound("rt_exporters_rebate", 1f, 1f);
