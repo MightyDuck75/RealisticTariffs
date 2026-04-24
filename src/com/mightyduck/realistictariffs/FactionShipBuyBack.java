@@ -167,77 +167,77 @@ public class FactionShipBuyBack implements EveryFrameScript{
 
     private void applyAndShowRewards() {
         CampaignFleetAPI playerFleet = Global.getSector().getPlayerFleet();
-        Color highlightColor = Misc.getHighlightColor();
-        Color textBaseColor = Misc.getTextColor();
-        String creditsStr = "";
 
+        // 1. Calculate Totals
+        float totalBonusCredits = regularFactionShipBonusCredits + rareFactionalShipBonusCredits;
 
-        // --- Process Regular Rewards ---
-        if (regularFactionShipBonusCredits > 0 || !regularFactionalShipBuybackRepChanges.isEmpty()) {
-            if (regularFactionShipBonusCredits > 0) {
-                playerFleet.getCargo().getCredits().add(regularFactionShipBonusCredits);
-                creditsStr = Misc.getDGSCredits(rareFactionalShipBonusCredits);
+        // Aggregate rep specifically for the current market's faction for the Intel display
+        String marketFactionId = currentMarket.getFaction().getId();
+        float marketFactionRepChange = 0f;
+        if (regularFactionalShipBuybackRepChanges.containsKey(marketFactionId)) {
+            marketFactionRepChange += regularFactionalShipBuybackRepChanges.get(marketFactionId);
+        }
+        if (rareFactionalShipBuybackRepChanges.containsKey(marketFactionId)) {
+            marketFactionRepChange += rareFactionalShipBuybackRepChanges.get(marketFactionId);
+        }
 
-            }
-            for (Map.Entry<String, Float> entry : regularFactionalShipBuybackRepChanges.entrySet()) {
-                applyReputation(entry.getKey(), entry.getValue());
-            }
+        // 2. Check if we have any rewards worth notifying
+        if (totalBonusCredits > 0 || marketFactionRepChange != 0) {
 
-            // Only show credit message if credits were actually awarded (since sometimes it's rep only)
-            if (regularFactionShipBonusCredits > 0) {
-                creditsStr = "+"+Misc.getDGSCredits(regularFactionShipBonusCredits);
-                String notificationTitle = "Ship Buyback Program ";
-                String intelMessage = creditsStr + " transferred as compensation";
-
-                String sectionHeadingText = "The faction "+ currentMarket.getFaction().getDisplayName() + " recognizes your contribution and compensates you for " +
-                        "helping the war effort.";
-                String sectionHeadingLabel = "Transaction Details";
-                String reputationDetail = "+"+(int)(reputation*100);
-
-                List<ExpandedParagraphForIntel> details = Arrays.asList(
-                        new ExpandedParagraphForIntel("Faction: "+ currentMarket.getFaction().getDisplayName(), currentMarket.getFaction().getDisplayName(), currentMarket.getFaction().getBaseUIColor()),
-                        new ExpandedParagraphForIntel("Bonus Credits: " + creditsStr, creditsStr, Misc.getHighlightColor()),
-                        new ExpandedParagraphForIntel("Reputation Change: " + reputationDetail ,reputationDetail, Misc.getPositiveHighlightColor())
-                );
-
-                IntelMessageNotification intel = new IntelMessageNotification(
-                        notificationTitle,
-                        intelMessage,
-                        new String[]{ creditsStr },
-                        new Color[]{Misc.getHighlightColor() },
-                        "Ship Buyback Program",
-                        details,
-                        currentMarket.getFaction().getId(),
-                        currentMarket,
-                        sectionHeadingText,
-                        Misc.getGrayColor(),
-                        sectionHeadingLabel,
-                        "icons",
-                        "rt_rebate_icon",
-                        Tags.INTEL_LOCAL
-                );
-
-                Global.getSector().getIntelManager().addIntel(intel, false);
-                intel.endAfterDelay(4f);
-
-            } else {
-                Global.getSector().getCampaignUI().addMessage(
-                        "Local government thanks you for conducting faction ship sales inside their markets.",
-                        textBaseColor
-                );
-
+            // Apply Credits to player
+            if (totalBonusCredits > 0) {
+                playerFleet.getCargo().getCredits().add(totalBonusCredits);
             }
 
-            // Exotic/Rare Ships like XIV Battlegroup
-            if (rareFactionalShipBonusCredits > 0 || !rareFactionalShipBuybackRepChanges.isEmpty()) {
-                if (rareFactionalShipBonusCredits > 0) {
-                    playerFleet.getCargo().getCredits().add(rareFactionalShipBonusCredits);
-                }
-                for (Map.Entry<String, Float> entry : rareFactionalShipBuybackRepChanges.entrySet()) {
-                    applyReputation(entry.getKey(), entry.getValue());
-                }
+            // Prepare strings using the Credit Symbol icon
+            String creditsStr = "+" + Misc.getDGSCredits(totalBonusCredits);
+            String repStr = (marketFactionRepChange >= 0 ? "+" : "") + (int)(marketFactionRepChange * 100);
+
+            List<ExpandedParagraphForIntel> details = new ArrayList<>();
+            details.add(new ExpandedParagraphForIntel("Faction: " + currentMarket.getFaction().getDisplayName(),
+                    currentMarket.getFaction().getDisplayName(), currentMarket.getFaction().getBaseUIColor()));
+
+            if (totalBonusCredits > 0) {
+                details.add(new ExpandedParagraphForIntel("Bonus Credits: " + creditsStr, creditsStr, Misc.getHighlightColor()));
+            }
+            if (marketFactionRepChange != 0) {
+                Color repColor = marketFactionRepChange > 0 ? Misc.getPositiveHighlightColor() : Misc.getNegativeHighlightColor();
+                details.add(new ExpandedParagraphForIntel("Reputation Change: " + repStr, repStr, repColor));
             }
 
+            String sectionHeadingText = "The " + currentMarket.getFaction().getDisplayName() +
+                    " recognizes your contribution and compensates you for assisting their war effort.";
+
+            // 3. Trigger Intel Notification FIRST
+            // This ensures the popup is created before the text messages hit the queue
+            IntelMessageNotification intel = new IntelMessageNotification(
+                    "Ship Buyback Program",
+                    creditsStr + " transferred as compensation",
+                    new String[]{creditsStr},
+                    new Color[]{Misc.getHighlightColor()},
+                    "Ship Buyback Program",
+                    details,
+                    marketFactionId,
+                    currentMarket,
+                    sectionHeadingText,
+                    Misc.getGrayColor(),
+                    "Transaction Details",
+                    "icons",
+                    "rt_rebate_icon",
+                    Tags.INTEL_LOCAL
+            );
+
+            Global.getSector().getIntelManager().addIntel(intel, false);
+            intel.endAfterDelay(4f);
+        }
+
+        // 4. Apply all Reputation changes AFTER the Intel is added
+        // This causes the vanilla "Relationship improved" messages to appear SECOND
+        for (Map.Entry<String, Float> entry : regularFactionalShipBuybackRepChanges.entrySet()) {
+            applyReputation(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Float> entry : rareFactionalShipBuybackRepChanges.entrySet()) {
+            applyReputation(entry.getKey(), entry.getValue());
         }
     }
 
