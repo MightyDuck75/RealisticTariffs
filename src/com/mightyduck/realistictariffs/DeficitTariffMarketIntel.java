@@ -12,14 +12,15 @@ import java.util.*;
 import java.util.List;
 
 public class DeficitTariffMarketIntel extends BaseMarketIntel {
-    private int countIllegalGoods = 0, countNormalGoods = 0;
-    private Boolean hasOnlyIllegalGoodsDemand;
-    private final Color intelTitleBlueColor, goldColor, grayColor;
+    private int countIllegalGoods = 0;
+    private int countNormalGoods = 0;
+    private boolean hasOnlyIllegalGoodsDemand = false;
 
-    private List<String> mapLegalCommoditiesDeficit = new ArrayList<>();
-    private List<String> mapIllegalCommoditiesDeficit = new ArrayList<>();
+    private final Color intelTitleBlueColor;
+    private final Color goldColor;
+    private final Color grayColor;
 
-    private final List<String> Eco_Commodities = Arrays.asList(
+    private final List<String> economyCommodities = Arrays.asList(
             Commodities.SHIPS, Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
             Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
             Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
@@ -29,16 +30,15 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
 
     public DeficitTariffMarketIntel(MarketAPI market) {
         super(market);
-        intelTitleBlueColor = Misc.getBasePlayerColor();
-        goldColor = Misc.getHighlightColor();
-        grayColor = Misc.getGrayColor();
-        hasOnlyIllegalGoodsDemand = false; // Reset here
+        this.intelTitleBlueColor = Misc.getBasePlayerColor();
+        this.goldColor = Misc.getHighlightColor();
+        this.grayColor = Misc.getGrayColor();
+
         refreshShortageStats(); // Calculate once on start
     }
 
     @Override
     public String getName() {
-        // Only illegal goods
         if (hasOnlyIllegalGoodsDemand) {
             return "Shortages of illicit goods in " + market.getName();
         }
@@ -47,9 +47,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
 
         if (tariff <= RTConfig.criticalTariffThreshold) {
             return "Critical Shortages in " + market.getName();
-        }
-
-        if (tariff > RTConfig.criticalTariffThreshold && tariff <= RTConfig.severeTariffThreshold) {
+        } else if (tariff <= RTConfig.severeTariffThreshold) {
             return "Severe Shortages in " + market.getName();
         }
 
@@ -58,56 +56,76 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
 
     @Override
     public void createIntelInfo(TooltipMakerAPI info, ListInfoMode mode) {
-        if (countNormalGoods > 0 || countIllegalGoods > 0) {
-            String intelTitleMsg = getName();
-            info.addPara(intelTitleMsg, 0f, intelTitleBlueColor, market.getTextColorForFactionOrPlanet());
-            if (intelTitleMsg.startsWith("Shortages of illicit goods in ")) {
-                info.addPara("Profitable opportunities for those dealing in illegal goods", grayColor, 3f);
-            } else {
-                String highlightText = (int)(market.getTariff().getModifiedValue()*100f) + "%";
-                String fullText = "Local government lowered tariffs to " + (int)(market.getTariff().getModifiedValue()*100f) + "%%";
-                info.addPara(fullText, 3f, Misc.getGrayColor(), goldColor, highlightText);
-            }
+        // If there are no shortages, don't draw anything
+        if (countNormalGoods == 0 && countIllegalGoods == 0) return;
+
+        info.addPara(getName(), 0f, intelTitleBlueColor, market.getTextColorForFactionOrPlanet());
+
+        float pad = 3f;
+        if (hasOnlyIllegalGoodsDemand) {
+            info.addPara("Profitable opportunities for those dealing in illegal goods", grayColor, pad);
+        } else {
+            // Clean percentage calculation and display
+            int tariffPercent = (int)(market.getTariff().getModifiedValue() * 100f);
+            String highlightText = tariffPercent + "%";
+            String fullText = "Local government lowered tariffs to " + tariffPercent + "%%";
+            info.addPara(fullText, pad, grayColor, goldColor, highlightText);
         }
     }
 
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
-        if (countNormalGoods > 0 || countIllegalGoods > 0) {
-            info.addImage(getIcon(), width, 128f, 10f);
+        if (countNormalGoods == 0 && countIllegalGoods == 0) return;
 
-            info.addPara("There are severe resource shortages in %s. The following commodities are in critical deficit:",
-                    10f, market.getTextColorForFactionOrPlanet(), market.getName());
+        float opad = 10f;
+        info.addImage(getIcon(), width, 128f, opad);
 
-            // EVERYTHING that is in demand for maximum profit info.
-            for (CommodityOnMarketAPI commMkrt : market.getCommoditiesCopy()) {
-                if (!commMkrt.isNonEcon() && commMkrt.getMaxDemand() > commMkrt.getAvailable()) {
-                    if (commMkrt.getId().equals(Commodities.DRUGS) || commMkrt.getId().equals(Commodities.ORGANS)) {
-                        info.addPara("- " + commMkrt.getCommodity().getName(), Color.RED, 3f);
-                    } else {
-                        info.addPara("- " + commMkrt.getCommodity().getName(), Misc.getNegativeHighlightColor(), 3f);
-                    }
-                }
+        info.addPara("There are severe resource shortages in %s. The following commodities are in critical deficit:",
+                opad, market.getTextColorForFactionOrPlanet(), market.getName());
+
+        addCommodityShortageList(info);
+        addClosingTextToTheSmallDescription(info, opad);
+    }
+
+    private void addCommodityShortageList(TooltipMakerAPI info) {
+        float pad = 3f;
+
+        for (CommodityOnMarketAPI commMkrt : market.getCommoditiesCopy()) {
+            if (commMkrt.isNonEcon() || commMkrt.getMaxDemand() <= commMkrt.getAvailable()) {
+                continue; // Skip non-economic items or items with no deficit
             }
 
-            if (hasOnlyIllegalGoodsDemand) {
-                info.addPara("This market has seen a increase in demand for illicit goods.", 10f);
+            String commId = commMkrt.getId();
+            String bulletText = "- " + commMkrt.getCommodity().getName();
+
+            if (commId.equals(Commodities.DRUGS) || commId.equals(Commodities.ORGANS)) {
+                info.addPara(bulletText, Color.RED, pad);
             } else {
-                info.addPara("Local authorities have slashed trade tariffs on essential goods to incentivize independent merchants.", 10f);
+                info.addPara(bulletText, Misc.getNegativeHighlightColor(), pad);
             }
+        }
+    }
+
+    // --- HELPER 2: Draws the lore/narrative text at the bottom ---
+    private void addClosingTextToTheSmallDescription(TooltipMakerAPI info, float opad) {
+        if (hasOnlyIllegalGoodsDemand) {
+            info.addPara("This market has seen an increase in demand for illicit goods.", opad);
+        } else {
+            info.addPara("Local authorities have slashed trade tariffs on essential goods to incentivize independent merchants.", opad);
         }
     }
 
     @Override
     public Set<String> getIntelTags(SectorMapAPI map) {
         Set<String> tags = super.getIntelTags(map);
-
         float tariff = market.getTariff().getModifiedValue();
 
-        if (tariff <= RTConfig.criticalTariffThreshold && !hasOnlyIllegalGoodsDemand)
+        if (tariff <= RTConfig.criticalTariffThreshold && !hasOnlyIllegalGoodsDemand) {
             tags.add(Tags.INTEL_IMPORTANT);
-        if (tariff > RTConfig.criticalTariffThreshold || countIllegalGoods >= 1)
+        }
+        if (tariff > RTConfig.criticalTariffThreshold || countIllegalGoods >= 1) {
             tags.add(Tags.INTEL_TRADE);
+        }
 
         return tags;
     }
@@ -115,23 +133,19 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
     public void refreshShortageStats() {
         countIllegalGoods = 0;
         countNormalGoods = 0;
-        hasOnlyIllegalGoodsDemand = false; // Reset here
-        mapLegalCommoditiesDeficit.clear();
-        mapIllegalCommoditiesDeficit.clear();
 
         for (CommodityOnMarketAPI commMkrt : market.getCommoditiesCopy()) {
             if (commMkrt.getMaxDemand() > commMkrt.getAvailable()) {
-                if (Eco_Commodities.contains(commMkrt.getId())) {
-                    mapLegalCommoditiesDeficit.add(commMkrt.getId());
+                String id = commMkrt.getId();
+
+                if (economyCommodities.contains(id)) {
                     countNormalGoods++;
-                } else if(commMkrt.getId().equals(Commodities.ORGANS) || commMkrt.getId().equals(Commodities.DRUGS)){
+                } else if (id.equals(Commodities.ORGANS) || id.equals(Commodities.DRUGS)) {
                     countIllegalGoods++;
-                    mapIllegalCommoditiesDeficit.add(commMkrt.getId());
                 }
             }
         }
 
-        if (countNormalGoods == 0 && countIllegalGoods > 0)
-            hasOnlyIllegalGoodsDemand = true;
+        hasOnlyIllegalGoodsDemand = (countNormalGoods == 0 && countIllegalGoods > 0);
     }
 }

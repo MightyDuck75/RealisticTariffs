@@ -31,10 +31,13 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
         switch (condition) {
             case DEMAND_CRITICAL: return "Critical Shortage of Ships & Armaments in " + mName;
             case DEMAND_MODERATE: return "Moderate Shortage of Ships & Armaments in " + mName;
-            case DEMAND_MINOR: return "Minor Shortage of Ships & Armaments in " + mName;
-            case WAR_MULTIPLE: return "Multi-Front War Drives Military Prices";
-            case WAR_SINGLE: return "War-Driven Military Price Inflation";
-            case FACTION_BUYBACK_HEGEMONY, FACTION_BUYBACK_LUDDICPATH, FACTION_BUYBACK_LUDDICCHURCH, FACTION_BUYBACK_TRITACHYON:
+            case DEMAND_MINOR:    return "Minor Shortage of Ships & Armaments in " + mName;
+            case WAR_MULTIPLE:    return "Multi-Front War Drives Military Prices";
+            case WAR_SINGLE:      return "War-Driven Military Price Inflation";
+            case FACTION_BUYBACK_HEGEMONY:
+            case FACTION_BUYBACK_LUDDICPATH:
+            case FACTION_BUYBACK_LUDDICCHURCH:
+            case FACTION_BUYBACK_TRITACHYON:
                 return fName + " Ship Buyback Initiative";
             default: return "Market Update: " + mName;
         }
@@ -42,15 +45,13 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
 
     @Override
     public void createIntelInfo(TooltipMakerAPI info, ListInfoMode mode) {
-        Color c = getTitleColor(mode);
-        info.addPara(getName(), c, 0f);
+        info.addPara(getName(), getTitleColor(mode), 0f);
 
         float pad = 3f;
         Color gray = Misc.getGrayColor();
         Color highlight = Misc.getHighlightColor();
         String fName = market.getFaction().getDisplayName();
 
-        // Small Context Text
         switch (condition) {
             case DEMAND_CRITICAL:
                 info.addPara("Ship sale prices have surged to %s and weapon prices to %s", pad, gray, highlight,
@@ -68,9 +69,12 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
                 info.addPara("The expansion of %s's conflicts has further increased military prices", pad, gray, market.getFaction().getBaseUIColor(), fName);
                 break;
             case WAR_SINGLE:
-                info.addPara("Ongoing conflict has increased ship and weapon prices across faction markets", gray,pad);
+                info.addPara("Ongoing conflict has increased ship and weapon prices across faction markets", gray, pad);
                 break;
-            case FACTION_BUYBACK_HEGEMONY, FACTION_BUYBACK_LUDDICPATH, FACTION_BUYBACK_LUDDICCHURCH, FACTION_BUYBACK_TRITACHYON:
+            case FACTION_BUYBACK_HEGEMONY:
+            case FACTION_BUYBACK_LUDDICPATH:
+            case FACTION_BUYBACK_LUDDICCHURCH:
+            case FACTION_BUYBACK_TRITACHYON:
                 info.addPara("%s is offering bonuses for returning faction ships", pad, gray, highlight, fName);
                 break;
         }
@@ -79,71 +83,92 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
     @Override
     public void createSmallDescription(TooltipMakerAPI info, float width, float height) {
         float opad = 10f;
-        float pad = 3f;
-        Color h = Misc.getHighlightColor();
         FactionAPI faction = market.getFaction();
-        String fName = faction.getDisplayName();
-        String mName = market.getName();
 
         info.addImages(width, 128, opad, opad, faction.getCrest());
 
-        // Full Descriptions & Variable Bullets
+        generateNarrativeDescription(info, faction, opad);
+
+        generateStatBullets(info, faction);
+    }
+
+    private void generateNarrativeDescription(TooltipMakerAPI info, FactionAPI faction, float opad) {
+        String mName = market.getName();
+        String fName = faction.getDisplayName();
+        Color fColor = faction.getBaseUIColor();
+
         switch (condition) {
             case DEMAND_CRITICAL:
                 info.addPara("%s is experiencing a critical shortage of both ships and military-grade weaponry. Fleet losses, " +
                         "logistical strain, and heightened demand have driven prices sharply upward, creating highly profitable opportunities " +
-                        "for independent traders willing to supply the market.", opad, faction.getBaseUIColor(), mName);
-                addTradeBullets(info, pad, h, RTConfig.shipsDemandHighSellPriceBoost, RTConfig.weaponsDemandHighSellPriceBoost, RTConfig.shipsDemandHighBuyPriceBoost, RTConfig.weaponsDemandHighBuyPriceBoost, faction.getId());
+                        "for independent traders willing to supply the market.", opad, fColor, mName);
                 break;
-
             case DEMAND_MODERATE:
                 info.addPara("%s is currently facing a notable deficit in ships and ship-mounted weaponry. Ongoing demand has begun to outpace " +
-                        "supply, pushing market prices upward and creating favorable conditions for traders supplying military assets.",
-                        opad, faction.getBaseUIColor(), mName);
-                addTradeBullets(info, pad, h, RTConfig.shipsDemandModerateSellPriceBoost, RTConfig.weaponsDemandModerateSellPriceBoost, RTConfig.shipsDemandModerateBuyPriceBoost, RTConfig.weaponsDemandModerateBuyPriceBoost, faction.getId());
+                        "supply, pushing market prices upward and creating favorable conditions for traders supplying military assets.", opad, fColor, mName);
                 break;
-
             case DEMAND_MINOR:
                 info.addPara("%s is experiencing a mild shortage of ships and associated weaponry. While not critical, the reduced " +
-                        "supply has led to a modest increase in both selling and purchasing prices, offering limited but reliable trade opportunities.",
-                        opad, faction.getBaseUIColor(), mName);
-                addTradeBullets(info, pad, h, RTConfig.shipsDemandMinorSellPriceBoost, RTConfig.weaponsDemandMinorSellPriceBoost, RTConfig.shipsDemandMinorBuyPriceBoost, RTConfig.weaponsDemandMinorBuyPriceBoost, faction.getId());
+                        "supply has led to a modest increase in both selling and purchasing prices, offering limited but reliable trade opportunities.", opad, fColor, mName);
                 break;
-
             case WAR_MULTIPLE:
                 info.addPara("%s is now engaged across multiple fronts, stretching its logistical and industrial capacity to the limit. The escalating " +
-                        "demand for ships and weapon systems has driven military market prices to unprecedented levels.",
-                        opad, faction.getBaseUIColor(), fName);
-                addTradeBullets(info, pad, h, RTConfig.shipMultipleWarsPricesBonus, RTConfig.weaponsMultipleWarsPricesBonus, RTConfig.shipMultipleWarsPricesBonus, RTConfig.weaponsMultipleWarsPricesBonus, faction.getId());
+                        "demand for ships and weapon systems has driven military market prices to unprecedented levels.", opad, fColor, fName);
                 break;
-
             case WAR_SINGLE:
                 info.addPara("The escalating conflict between %s and its adversary has begun to strain military supply chains. As demand for ships " +
-                        "and weapons intensifies, market prices have risen accordingly across affected systems.",
-                        opad, faction.getBaseUIColor(), fName);
-                addTradeBullets(info, pad, h, RTConfig.shipWarPricesBonus, RTConfig.weaponsWarPricesBonus, RTConfig.shipWarPricesBonus, RTConfig.weaponsWarPricesBonus, faction.getId());
+                        "and weapons intensifies, market prices have risen accordingly across affected systems.", opad, fColor, fName);
                 break;
             case FACTION_BUYBACK_HEGEMONY:
                 info.addPara("With war placing increasing pressure on fleet strength, %s has initiated a ship buyback program to recover and redeploy " +
-                        "its own designs. Captains willing to sell compatible vessels will receive additional compensation as part of this effort in " +
-                        "particularly for those belonging to the XIV Battlegroup.",
-                        opad, faction.getBaseUIColor(), fName);
-                info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.factionShipSellBonus));
+                        "its own designs. Captains willing to sell compatible vessels will receive additional compensation as part of this effort, in " +
+                        "particular for those belonging to the XIV Battlegroup.", opad, fColor, fName);
+                break;
+            case FACTION_BUYBACK_LUDDICPATH:
+            case FACTION_BUYBACK_LUDDICCHURCH:
+            case FACTION_BUYBACK_TRITACHYON:
+                info.addPara("With war placing increasing pressure on fleet strength, %s has initiated a ship buyback program to recover and redeploy" +
+                        " its own designs. Captains willing to sell compatible vessels will receive additional compensation as part of this effort.", opad, fColor, fName);
+                break;
+        }
+    }
+
+    private void generateStatBullets(TooltipMakerAPI info, FactionAPI faction) {
+        float pad = 3f;
+        Color h = Misc.getHighlightColor();
+
+        switch (condition) {
+            case DEMAND_CRITICAL:
+                addTradeBulletListToIntelSmallDescription(info, pad, h, RTConfig.shipsDemandHighSellPriceBoost, RTConfig.weaponsDemandHighSellPriceBoost, RTConfig.shipsDemandHighBuyPriceBoost, RTConfig.weaponsDemandHighBuyPriceBoost);
+                break;
+            case DEMAND_MODERATE:
+                addTradeBulletListToIntelSmallDescription(info, pad, h, RTConfig.shipsDemandModerateSellPriceBoost, RTConfig.weaponsDemandModerateSellPriceBoost, RTConfig.shipsDemandModerateBuyPriceBoost, RTConfig.weaponsDemandModerateBuyPriceBoost);
+                break;
+            case DEMAND_MINOR:
+                addTradeBulletListToIntelSmallDescription(info, pad, h, RTConfig.shipsDemandMinorSellPriceBoost, RTConfig.weaponsDemandMinorSellPriceBoost, RTConfig.shipsDemandMinorBuyPriceBoost, RTConfig.weaponsDemandMinorBuyPriceBoost);
+                break;
+            case WAR_MULTIPLE:
+                addTradeBulletListToIntelSmallDescription(info, pad, h, RTConfig.shipMultipleWarsPricesBonus, RTConfig.weaponsMultipleWarsPricesBonus, RTConfig.shipMultipleWarsPricesBonus, RTConfig.weaponsMultipleWarsPricesBonus);
+                break;
+            case WAR_SINGLE:
+                addTradeBulletListToIntelSmallDescription(info, pad, h, RTConfig.shipWarPricesBonus, RTConfig.weaponsWarPricesBonus, RTConfig.shipWarPricesBonus, RTConfig.weaponsWarPricesBonus);
+                break;
+            case FACTION_BUYBACK_HEGEMONY:
+                info.addPara(" %s Selling Faction Ships ", 10f, h, formatBoost(RTConfig.factionShipSellBonus));
                 info.addPara(" %s Selling XIV Battlegroup Ships", 0f, h, formatBoost(RTConfig.exoticShipSellPriceBonus));
                 break;
-            case FACTION_BUYBACK_LUDDICPATH, FACTION_BUYBACK_LUDDICCHURCH, FACTION_BUYBACK_TRITACHYON:
-                info.addPara("With war placing increasing pressure on fleet strength, %s has initiated a ship buyback program to recover and redeploy" +
-                        " its own designs. Captains willing to sell compatible vessels will receive additional compensation as part of this effort.",
-                        opad, faction.getBaseUIColor(), fName);
-                info.addPara(" %s Selling Faction Ships ", opad, h, formatBoost(RTConfig.factionShipSellBonus));
-                if(Factions.DIKTAT == faction.getId()){
+            case FACTION_BUYBACK_LUDDICPATH:
+            case FACTION_BUYBACK_LUDDICCHURCH:
+            case FACTION_BUYBACK_TRITACHYON:
+                info.addPara(" %s Selling Faction Ships ", 10f, h, formatBoost(RTConfig.factionShipSellBonus));
+                if (Factions.DIKTAT.equals(faction.getId())) {
                     info.addPara(" %s Selling Lion's Guard Ships", 0f, h, formatBoost(RTConfig.exoticShipSellPriceBonus));
                 }
                 break;
         }
     }
 
-    private void addTradeBullets(TooltipMakerAPI info, float pad, Color h, float sellShip, float sellWeap, float buyShip, float buyWeap, String faction) {
+    private void addTradeBulletListToIntelSmallDescription(TooltipMakerAPI info, float pad, Color h, float sellShip, float sellWeap, float buyShip, float buyWeap) {
         info.addPara(" %s Selling Ships", pad, h, formatBoost(sellShip));
         info.addPara(" %s Selling Weapons", 0f, h, formatBoost(sellWeap));
         info.addPara(" %s Buying Ships", 0f, h, formatBoost(buyShip));
