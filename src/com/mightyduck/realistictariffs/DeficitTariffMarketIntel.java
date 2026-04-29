@@ -20,7 +20,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
     private final Color goldColor;
     private final Color grayColor;
 
-    private final List<String> economyCommodities = Arrays.asList(
+    private List<String> ecoCommodities = Arrays.asList(
             Commodities.SHIPS, Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
             Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
             Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
@@ -138,7 +138,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
             if (commMkrt.getMaxDemand() > commMkrt.getAvailable()) {
                 String id = commMkrt.getId();
 
-                if (economyCommodities.contains(id)) {
+                if (ecoCommodities.contains(id)) {
                     countNormalGoods++;
                 } else if (id.equals(Commodities.ORGANS) || id.equals(Commodities.DRUGS)) {
                     countIllegalGoods++;

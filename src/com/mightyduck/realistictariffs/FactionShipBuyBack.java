@@ -29,8 +29,11 @@ public class FactionShipBuyBack implements EveryFrameScript{
     private float exoticShipRepLoss = 0f, factionShipRepLoss = 0f;
 
     private float reputation = 0f;
-    // Tracks the state of the player's fleet to safely detect sold ships
-    private final Map<String, FleetMemberAPI> currentFleetThatEntersMarket = new HashMap<>();
+
+    // Unique key for saving our data into the Starsector save file
+    private static final String PERSISTENT_BUYBACK_TRACKER_KEY = "md_ship_buyback_tracker";
+    // Tracks the state of the player's fleet to safely detect sold ship
+    private Map<String, FleetMemberAPI> currentFleetThatEntersMarket = new HashMap<>();
 
     // Aggregators for the current transaction session
     private float rareFactionalShipBonusCredits = 0f, regularFactionShipBonusCredits = 0f;
@@ -99,6 +102,13 @@ public class FactionShipBuyBack implements EveryFrameScript{
     private void processSoldShip(FleetMemberAPI ship, MarketAPI market) {
         String marketFactionId = market.getFaction().getId();
 
+        String shipId = ship.getId();
+        Set<String> processedShipIds = getBuybackHistory();
+
+        if (processedShipIds.contains(shipId)) {
+            return;
+        }
+
         // 1. Get the exact number of D-Mods on the ship
         int dmods = DModManager.getNumDMods(ship.getVariant());
 
@@ -138,6 +148,7 @@ public class FactionShipBuyBack implements EveryFrameScript{
                     accumulateRep(rareFactionalShipBuybackRepChanges, exoticFactionId, RTConfig.exoticShipSaleReputationLoss);
                 }
             }
+            processedShipIds.add(shipId);
             return; // Ship processed as exotic, skip regular rules
         }
 
@@ -162,6 +173,7 @@ public class FactionShipBuyBack implements EveryFrameScript{
                     accumulateRep(regularFactionalShipBuybackRepChanges, regularFactionId, RTConfig.factionShipSaleReputationLoss);
                 }
             }
+            processedShipIds.add(shipId);
         }
     }
 
@@ -283,6 +295,15 @@ public class FactionShipBuyBack implements EveryFrameScript{
         if (manufacturer.contains("pirate")) return Factions.PIRATES;
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<String> getBuybackHistory() {
+        Map<String, Object> data = Global.getSector().getPersistentData();
+        if (!data.containsKey(PERSISTENT_BUYBACK_TRACKER_KEY)) {
+            data.put(PERSISTENT_BUYBACK_TRACKER_KEY, new HashSet<String>());
+        }
+        return (Set<String>) data.get(PERSISTENT_BUYBACK_TRACKER_KEY);
     }
 
     // Tracking Helpers & Memory Management

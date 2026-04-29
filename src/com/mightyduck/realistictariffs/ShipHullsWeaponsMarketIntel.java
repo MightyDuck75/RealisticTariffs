@@ -75,7 +75,7 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
             case FACTION_BUYBACK_LUDDICPATH:
             case FACTION_BUYBACK_LUDDICCHURCH:
             case FACTION_BUYBACK_TRITACHYON:
-                info.addPara("%s is offering bonuses for returning faction ships", pad, gray, highlight, fName);
+                info.addPara("%s is offering bonuses for returning faction ships", pad, gray,  market.getFaction().getBaseUIColor(), fName);
                 break;
         }
     }
