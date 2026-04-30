@@ -16,11 +16,13 @@ import java.util.List;
 public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     private final IntervalUtil tracker = new IntervalUtil(1f, 1f); // Check once per day
 
-    // Define which factions have specific/elite ships for the buyback programs
+    // Define which factions have faction design ships for the buyback programs
     private final List<String> FACTION_SHIP_OWNERS = Arrays.asList(
             Factions.HEGEMONY, Factions.DIKTAT, Factions.TRITACHYON,
             Factions.PERSEAN, Factions.LUDDIC_CHURCH, Factions.LUDDIC_PATH, Factions.PIRATES
     );
+
+    private final int minorDeficitTrigger = 1, moderateDeficitTrigger = 2, highDeficitTrigger = 3;
 
     @Override
     public void advance(float amount) {
@@ -33,7 +35,6 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     }
 
     private void evaluateSectorConditions() {
-// 1. Identify the 'Representative' market for every faction (the largest one)
         // This ensures Faction-wide intel only appears ONCE per faction.
         Map<String, MarketAPI> representativeMarkets = new HashMap<>();
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
@@ -46,7 +47,7 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
             }
         }
 
-        // 2. Loop through all markets and determine which intel they should have
+        // Loop through all markets and determine which intel they should have
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             if (market.isHidden() || market.getFaction().isPlayerFaction()) continue;
 
@@ -66,19 +67,18 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
         // 1. Ship Deficit Logic
         int shipDeficit = ships.getMaxDemand() - ships.getAvailable();
 
-        if (shipDeficit >= 3) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL);
-        else if (shipDeficit == 2) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_MODERATE);
-        else if (shipDeficit == 1) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_MINOR);
+        if (shipDeficit >= highDeficitTrigger) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL);
+        else if (shipDeficit == moderateDeficitTrigger) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_MODERATE);
+        else if (shipDeficit == minorDeficitTrigger) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_MINOR);
 
         // 2. War Logic
         if (isRepresentative && !fId.equals(Factions.PIRATES) && !fId.equals(Factions.LUDDIC_PATH)){
             int activeWars = getActiveWarCount(market.getFaction());
 
-            if (activeWars > 1) {
+            if (activeWars > 1)
                 conditions.add(ShipHullsWeaponsIntelMarketCondition.WAR_MULTIPLE);
-            } else if (activeWars == 1) {
+            else if (activeWars == 1)
                 conditions.add(ShipHullsWeaponsIntelMarketCondition.WAR_SINGLE);
-            }
 
             // Buyback program
             if (activeWars > 0 && (!fId.equals(Factions.PERSEAN) || !fId.equals(Factions.DIKTAT))) {
@@ -111,7 +111,7 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
         // Clean up conditions that are no longer true
         for (ShipHullsWeaponsMarketIntel intel : existingIntel) {
             if (!activeConditions.contains(intel.getCondition())) {
-                intel.endAfterDelay(); // Gracefully archives the intel before removal
+                intel.endAfterDelay();
             }
         }
 
@@ -124,36 +124,33 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
                     break;
                 }
             }
-            if (!exists) {
+
+            if (!exists)
                 Global.getSector().getIntelManager().addIntel(new ShipHullsWeaponsMarketIntel(market, condition));
-            }
         }
     }
 
     private int getActiveWarCount(FactionAPI faction) {
-        int count = 0;
+        int countFactionWars = 0;
         for (FactionAPI other : Global.getSector().getAllFactions()) {
-            // 1. Safety: Don't count yourself as an enemy
+            //Don't countFactionWars yourself as an enemy
             if (other == faction) continue;
 
-            // 2. The Golden Rule: Only count factions that show in the Intel/Diplomacy tab.
-            // This automatically filters out Remnants, Derelicts, Omega, and Guardians.
+            //Filters out Remnants, Derelicts, Omega, and Guardians.
             if (!other.isShowInIntelTab()) continue;
 
-            // 3. Keep your existing exclusions for players and neutral entities
+            //Dont count player faction and independents market
             if (other.isPlayerFaction() || other.isNeutralFaction()) continue;
 
-            // 4. Specifically ignore the 'Chaos' factions as you intended
+            //Ignore pirates and terrorists
             String id = other.getId();
             if (id.equals(Factions.PIRATES) || id.equals(Factions.LUDDIC_PATH)) continue;
 
-            // 5. Count hostiles
-            if (faction.isHostileTo(other)) {
-                count++;
-            }
+            if (faction.isHostileTo(other))
+                countFactionWars++;
         }
 
-        return count;
+        return countFactionWars;
     }
 
     @Override public boolean isDone() { return false; }

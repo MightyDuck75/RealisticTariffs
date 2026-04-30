@@ -12,16 +12,13 @@ import com.fs.starfarer.api.util.Misc;
 
 import java.awt.Color;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RebateManager extends BaseCampaignEventListener {
     public RebateManager(boolean permaRegister) {
         super(permaRegister);
     }
 
-    // This method fires automatically whenever the player confirms a trade
     @Override
     public void reportPlayerMarketTransaction(PlayerMarketTransaction transaction) {
         SubmarketAPI submarket = transaction.getSubmarket();
@@ -30,11 +27,11 @@ public class RebateManager extends BaseCampaignEventListener {
         // 1. Safety checks
         if (submarket == null || market == null) return;
 
-        // 2. EXCLUDE specific submarkets!
+        // Exclude storage and backmarket for getting rebates
         String submarketId = submarket.getSpecId();
         if (submarketId.equals(Submarkets.SUBMARKET_BLACK) ||
                 submarketId.equals(Submarkets.SUBMARKET_STORAGE)) {
-            return; // Abort the rebate entirely if it's the Black Market or Storage
+            return;
         }
 
         // 3. Get the market tariff
@@ -69,13 +66,6 @@ public class RebateManager extends BaseCampaignEventListener {
     }
 
     private void sendRebateNotification(float rebateAmount, float currentTariff, MarketAPI market, float transactionTotal) {
-//        String message = String.format("Exporter Rebate: %d credits returned from %s (Tariff: %d%%)",
-//                (int) rebateAmount,
-//                marketName,
-//                (int) (currentTariff * 100));
-//
-//        Global.getSector().getCampaignUI().addMessage(message, Color.GREEN);
-
         int creditsInt = (int) rebateAmount;
         int tariffInt = (int) (currentTariff * 100);
 
@@ -109,9 +99,7 @@ public class RebateManager extends BaseCampaignEventListener {
                 "Tariff Rebate Issued",
                 details,
                 market.getFaction().getId(),
-                market,
                 sectionHeadingText,
-                Misc.getGrayColor(),
                 sectionHeadingLabel,
                 "icons",
                 "rt_rebate_icon",
@@ -119,15 +107,11 @@ public class RebateManager extends BaseCampaignEventListener {
         );
 
         Global.getSector().getIntelManager().addIntel(intel, false);
-
-        // 3. IMPORTANT: Set a longer delay.
-        // This gives the player time to see it before it is moved to "History"
         intel.endAfterDelay(4f);
 
         try {
             Global.getSoundPlayer().playUISound("rt_exporters_rebate", 1f, 1f);
         } catch (Exception e) {
-            // If the sound fails, the game won't crash. We just log it so you know to fix it later.
             Global.getLogger(RebateManager.class).error("Failed to play rebate UI sound!", e);
         }
     }

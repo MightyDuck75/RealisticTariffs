@@ -4,6 +4,9 @@ import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 
 public class ShipHullsWeaponsDemandEconomy {
+    private static final int highDemandTrigger = 3;
+    private static final int minorDemandTrigger = 1;
+
     public static float getShipDemandSellMultiplier(MarketAPI market) {
         CommodityOnMarketAPI ships = market.getCommodityData("ships");
         if (ships == null) return 0f;
@@ -11,10 +14,10 @@ public class ShipHullsWeaponsDemandEconomy {
         int deficit = ships.getMaxDemand() - ships.getAvailable();
         float demandBonus;
 
-        if(deficit < 1)
+        if(deficit < minorDemandTrigger)
             demandBonus = 0f;
         else {
-            if (deficit >= 3)
+            if (deficit >= highDemandTrigger)
                 demandBonus = RTConfig.shipsDemandHighSellPriceBoost;
             else if (deficit == 1)
                 demandBonus = RTConfig.shipsDemandMinorSellPriceBoost;
@@ -31,12 +34,12 @@ public class ShipHullsWeaponsDemandEconomy {
         int deficit = ships.getMaxDemand() - ships.getAvailable();
         float demandBonus;
 
-        if(deficit < 1)
+        if(deficit < minorDemandTrigger)
             demandBonus = 0f;
         else {
-            if (deficit >= 3)
+            if (deficit >= highDemandTrigger)
                 demandBonus = RTConfig.shipsDemandHighBuyPriceBoost;
-            else if (deficit == 1)
+            else if (deficit == minorDemandTrigger)
                 demandBonus = RTConfig.shipsDemandMinorBuyPriceBoost;
             else
                 demandBonus = RTConfig.shipsDemandModerateBuyPriceBoost;
@@ -51,12 +54,12 @@ public class ShipHullsWeaponsDemandEconomy {
         int deficit = ships.getMaxDemand() - ships.getAvailable();
         float demandBonus;
 
-        if(deficit < 1)
+        if(deficit < minorDemandTrigger)
             demandBonus = 0f;
         else {
-            if(deficit>=3)
+            if(deficit >= highDemandTrigger)
                 demandBonus =  RTConfig.weaponsDemandHighSellPriceBoost;
-            else if (deficit == 1)
+            else if (deficit == minorDemandTrigger)
                 demandBonus = RTConfig.weaponsDemandMinorSellPriceBoost;
             else
                 demandBonus = RTConfig.weaponsDemandModerateSellPriceBoost;
@@ -71,12 +74,12 @@ public class ShipHullsWeaponsDemandEconomy {
         float demandBonus;
         int deficit = ships.getMaxDemand() - ships.getAvailable();
 
-        if(deficit < 1)
+        if(deficit < minorDemandTrigger)
             demandBonus = 0f;
         else {
-            if(deficit>=3)
+            if(deficit >= highDemandTrigger)
                 demandBonus =  RTConfig.weaponsDemandHighBuyPriceBoost;
-            else if (deficit == 1)
+            else if (deficit == minorDemandTrigger)
                 demandBonus = RTConfig.weaponsDemandMinorBuyPriceBoost;
             else
                 demandBonus = RTConfig.weaponsDemandModerateBuyPriceBoost;

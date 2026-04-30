@@ -14,9 +14,7 @@ import java.util.List;
 
 public class TariffUpdater implements EveryFrameScript {
     public static final String MOD_ID = "realistictariffs";
-
     private static final Logger log = Global.getLogger(TariffUpdater.class);
-
     private final IntervalUtil interval = new IntervalUtil(0.8f, 1.2f);
     private final Set<String> economicCommodities = new HashSet<>(Arrays.asList(
             Commodities.SHIPS,Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
@@ -34,9 +32,10 @@ public class TariffUpdater implements EveryFrameScript {
     @Override
     public void advance(float amount) {
         interval.advance(amount);
+
+        // Optimization not to run every frame
         if (!interval.intervalElapsed()) return;
 
-        // Optimization: Get the list of intel once per day
         List<IntelInfoPlugin> activeIntelList = Global.getSector().getIntelManager().getIntel(DeficitTariffMarketIntel.class);
 
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
@@ -47,30 +46,28 @@ public class TariffUpdater implements EveryFrameScript {
 
             for (CommodityOnMarketAPI commodity : market.getCommoditiesCopy()) {
                 if(economicCommodities.contains(commodity.getId())) {
+
                     // Check if it's an "essential" good (not illegal)
                     String id = commodity.getId();
                     if (commodity.getMaxDemand() > commodity.getAvailable()){
-                        if (!id.equals(Commodities.DRUGS) && !id.equals(Commodities.ORGANS)) {
+                        if (!id.equals(Commodities.DRUGS) && !id.equals(Commodities.ORGANS))
                             sumTariffReduction += RTConfig.tariffImpacts.getOrDefault(commodity.getId(), 0f);
-                        }
+
                         totalShortages++;
                     }
                 }
             }
 
-            // --- 3. APPLY TARIFFS ---
             applyTariffChanges(market, sumTariffReduction);
 
-            // --- 2. MANAGE INTEL ---
             handleIntel(market, totalShortages, activeIntelList);
         }
     }
 
     private boolean isValidMarket(MarketAPI market) {
-        if (market.getPrimaryEntity() == null) {
+        if (market.getPrimaryEntity() == null)
             return false;
-        }
-        // Use Misc.getStationMarket to avoid duplicating logic on stations vs planets
+
         return market.getId().equals(market.getPrimaryEntity().getMarket().getId());
     }
 
@@ -78,7 +75,9 @@ public class TariffUpdater implements EveryFrameScript {
         DeficitTariffMarketIntel existingIntel = null;
 
         for (IntelInfoPlugin plugin : activeIntelList) {
+
             DeficitTariffMarketIntel intel = (DeficitTariffMarketIntel) plugin;
+
             if (intel.getMarket() != null && intel.getMarket().getId().equals(market.getId())) {
                 if (!intel.isEnded() && !intel.isEnding()) {
                     existingIntel = intel;
@@ -96,14 +95,12 @@ public class TariffUpdater implements EveryFrameScript {
             existingIntel.endAfterDelay(0f);
 
         } else if (existingIntel != null) {
-            // FIX: Intel exists and there are still shortages.
             // Force the intel to re-evaluate its stats so it can change titles/tabs!
             existingIntel.refreshShortageStats();
         }
     }
 
     private void applyTariffChanges(MarketAPI market, float tariffReduction) {
-        // 3. Clean up any old modifiers from this mod to get a clean reading
         float setTariffsToNormal = 0f;
 
         market.getTariff().unmodify(MOD_ID);
@@ -111,21 +108,15 @@ public class TariffUpdater implements EveryFrameScript {
         if(market.getTariff().getModifiedValue() != RTConfig.normalTariff)
             setTariffsToNormal = RTConfig.normalTariff - market.getTariff().getModifiedValue();
 
-        // 4. Calculate how much we need to add/subtract to reach 0.18
         float currentTariff = market.getTariff().getModifiedValue();
 
-        // 2. Calculate the "Potential" new tariff
         float potentialTariff = currentTariff - (Math.abs(setTariffsToNormal) + tariffReduction) ;
 
-        // 3. Apply the Floor (The Math)
-        // Math.max returns the LARGER of the two numbers.
         float finalTargetTariff = Math.max(potentialTariff, RTConfig.lowestPossibleTariff);
 
-        // 4. Calculate the required Flat Modifier
+        //Calculate the required Flat Modifier
         float finalAdjustment = finalTargetTariff - currentTariff;
 
-        // 5. Apply the change
-        // We only apply it if the adjustment isn't 0 (to keep the UI clean)
         if (finalAdjustment != 0) {
             market.getTariff().modifyFlat(MOD_ID, finalAdjustment, "Realistic Tariffs Adjustment");
         }

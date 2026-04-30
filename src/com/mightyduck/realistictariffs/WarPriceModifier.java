@@ -38,21 +38,18 @@ public class WarPriceModifier {
         int wars = 0;
 
         for (FactionAPI other : Global.getSector().getAllFactions()) {
-            // 1. Safety: Don't count yourself as an enemy
+            //Safety: Don't count yourself as an enemy
             if (other == faction) continue;
 
-            // 2. The Golden Rule: Only count factions that show in the Intel/Diplomacy tab.
             // This automatically filters out Remnants, Derelicts, Omega, and Guardians.
             if (!other.isShowInIntelTab()) continue;
 
-            // 3. Keep your existing exclusions for players and neutral entities
+            // Maybe remove player faction? I think yes if player fleets attack and damages the faction markets
             if (other.isPlayerFaction() || other.isNeutralFaction()) continue;
 
-            // 4. Specifically ignore the 'Chaos' factions as you intended
             String id = other.getId();
             if (id.equals(Factions.PIRATES) || id.equals(Factions.LUDDIC_PATH)) continue;
 
-            // 5. Count hostiles
             if (faction.isHostileTo(other)) {
                 wars++;
             }

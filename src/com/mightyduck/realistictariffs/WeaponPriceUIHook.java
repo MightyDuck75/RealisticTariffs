@@ -8,7 +8,6 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import org.apache.log4j.Logger;
 
 public class WeaponPriceUIHook implements EveryFrameScript {
-
     private static final Logger log = Global.getLogger(WeaponPriceUIHook.class);
 
     @Override
@@ -23,9 +22,8 @@ public class WeaponPriceUIHook implements EveryFrameScript {
             float customBuyWpMult = ShipMarketEconomy.getWeaponBuyMultiplier(market);
 
             applyWarPricing(market, customBuyWpMult, customSellWpMult);
-        } else {
+        } else
             resetToVanilla();
-        }
     }
 
     private void applyWarPricing(MarketAPI market, float buyWeaponMult, float sellWeaponMult ) {
