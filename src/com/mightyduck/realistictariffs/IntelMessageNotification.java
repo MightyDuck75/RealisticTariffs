@@ -1,7 +1,6 @@
 package com.mightyduck.realistictariffs;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.impl.PlanetSearchData;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.LabelAPI;
@@ -19,15 +18,12 @@ public class IntelMessageNotification extends BaseIntelPlugin{
     private final Color[] highlightColors;
     private final String title;
     private final List<ExpandedParagraphForIntel> expandedParagraphs;
-
-    private final String factionId; // safer than MarketAPI
-    private final MarketAPI market;  // optional
     private final String sectionHeadingText;  // optional
-    private final Color sectionHeadingTextColor;
     private final String sectionHeadingLabel;  // optional
 
     private final String folder, icon;  // optional
 
+    private final String factionId;
     private final Boolean hasSecundarySectionHeading;
 
     private final Set<String> intelTags = new HashSet<>();
@@ -40,36 +36,7 @@ public class IntelMessageNotification extends BaseIntelPlugin{
             String title,
             List<ExpandedParagraphForIntel> detailLines,
             String factionId,
-            MarketAPI market
-    ) {
-        this.notificationTitle = notificationTitle;
-        this.text = text;
-        this.highlights = highlights;
-        this.highlightColors = highlightColors;
-        this.title = title;
-        this.expandedParagraphs = detailLines;
-        this.factionId = factionId;
-        this.market = market;
-
-        this.hasSecundarySectionHeading = false;
-        this.sectionHeadingText = "";
-        this.sectionHeadingTextColor = Color.BLACK;
-        this.sectionHeadingLabel = "";
-        this.folder = "";
-        this.icon = "";
-    }
-
-    public IntelMessageNotification(
-            String notificationTitle,
-            String text,
-            String[] highlights,
-            Color[] highlightColors,
-            String title,
-            List<ExpandedParagraphForIntel> detailLines,
-            String factionId,
-            MarketAPI market,
             String sectionHeadingText,
-            Color sectionHeadingTextColor,
             String sectionHeadingLabel,
             String folder,
             String icon,
@@ -81,11 +48,9 @@ public class IntelMessageNotification extends BaseIntelPlugin{
         this.highlightColors = highlightColors;
         this.title = title;
         this.expandedParagraphs = detailLines;
-        this.factionId = factionId;
-        this.market = market;
         this.hasSecundarySectionHeading = true;
+        this.factionId = factionId;
         this.sectionHeadingText = sectionHeadingText;
-        this.sectionHeadingTextColor = sectionHeadingTextColor;
         this.sectionHeadingLabel = sectionHeadingLabel;
         this.folder = folder;
         this.icon = icon;
@@ -97,12 +62,9 @@ public class IntelMessageNotification extends BaseIntelPlugin{
 
     @Override
     public void createIntelInfo(TooltipMakerAPI info, ListInfoMode mode) {
-        // This is what actually draws the text in the notification area
-        // We use Misc.getGrayColor() as the base for "returned from" etc.
-        info.addPara(notificationTitle,Misc.getBasePlayerColor(),0f);
+        info.addPara(notificationTitle, Misc.getBasePlayerColor(),0f);
         LabelAPI label = info.addPara(text, Misc.getGrayColor(), 0f);
 
-        // 2. Apply the highlights and their corresponding colors to the label object.
         label.setHighlight(highlights);
         label.setHighlightColors(highlightColors);
     }
@@ -124,7 +86,9 @@ public class IntelMessageNotification extends BaseIntelPlugin{
         if(folder != "")
             return Global.getSettings().getSpriteName(folder, icon);
 
-        return market.getFaction().getCrest();
+        return Global.getSector()
+                .getFaction(factionId)
+                .getCrest();
     }
 
     @Override
@@ -142,9 +106,8 @@ public class IntelMessageNotification extends BaseIntelPlugin{
         float opad = 10f;
         info.addPara(sectionHeadingText, opad);
 
-        if(hasSecundarySectionHeading){
+        if(hasSecundarySectionHeading)
             info.addSectionHeading(sectionHeadingLabel, Alignment.MID, opad);
-        }
 
         for (ExpandedParagraphForIntel para : expandedParagraphs) {
             info.addPara(para.text, opad, Misc.getTextColor(), para.colors, para.highlights);

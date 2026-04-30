@@ -22,17 +22,12 @@ import java.util.*;
 public class FactionShipBuyBack implements EveryFrameScript {
     private boolean wasInMarket = false;
     private MarketAPI currentMarket = null;
-
     private final Map<String, FleetMemberAPI> trackedFleet = new HashMap<>();
-
     private float rareShipCreditReward = 0f;
     private float regularShipCreditReward = 0f;
-
     private final Map<String, Float> rareShipRep = new HashMap<>();
     private final Map<String, Float> regularShipRep = new HashMap<>();
-
     private static final String PERSISTENT_KEY = "md_ship_buyback_tracker";
-
     private static final Logger log = Global.getLogger(FactionShipBuyBack.class);
 
     @Override
@@ -50,11 +45,10 @@ public class FactionShipBuyBack implements EveryFrameScript {
         InteractionDialogAPI dialog = Global.getSector().getCampaignUI().getCurrentInteractionDialog();
         boolean inMarket = isInMarket(dialog);
 
-        if (inMarket && !wasInMarket) {
+        if (inMarket && !wasInMarket)
             onMarketOpened(dialog);
-        } else if (!inMarket && wasInMarket) {
+        else if (!inMarket && wasInMarket)
             onMarketClosed();
-        }
     }
 
     private boolean isInMarket(InteractionDialogAPI dialog) {
@@ -97,20 +91,17 @@ public class FactionShipBuyBack implements EveryFrameScript {
     }
 
     private void confirmSaleShipSubjectToBuyback(Set<String> currentFleetIds) {
-
         for (Map.Entry<String, FleetMemberAPI> entry : trackedFleet.entrySet()) {
 
             String shipId = entry.getKey();
             FleetMemberAPI ship = entry.getValue();
 
-            if (!currentFleetIds.contains(shipId) && !isShipInStorage(shipId, currentMarket)) {
+            if (!currentFleetIds.contains(shipId) && !isShipInStorage(shipId, currentMarket))
                 processSoldShip(ship);
-            }
         }
     }
 
     private void processSoldShip(FleetMemberAPI ship) {
-
         Set<String> history = getHistory();
         if (history.contains(ship.getId())) return;
 
@@ -145,7 +136,6 @@ public class FactionShipBuyBack implements EveryFrameScript {
         boolean playerHostile = currentMarket.getFaction().isHostileTo(Factions.PLAYER);
 
         if (sameFaction) {
-
             float bonus = playerHostile
                     ? RTConfig.shipWarPricesBonus
                     : RTConfig.shipMultipleWarsPricesBonus;
@@ -153,10 +143,8 @@ public class FactionShipBuyBack implements EveryFrameScript {
             rareShipCreditReward += value * bonus;
 
             accumulateRep(rareShipRep, factionId, RTConfig.exoticShipSaleReputationGain);
-
-        } else {
+        } else
             accumulateRep(rareShipRep, factionId, RTConfig.exoticShipSaleReputationLoss);
-        }
     }
 
     private void handleRegularShip(FleetMemberAPI ship, String factionId, float value) {
@@ -164,19 +152,15 @@ public class FactionShipBuyBack implements EveryFrameScript {
         boolean playerHostile = currentMarket.getFaction().isHostileTo(Factions.PLAYER);
 
         if (sameFaction) {
-
-            if (!playerHostile) {
+            if (!playerHostile)
                 regularShipCreditReward += value * RTConfig.factionShipSellBonus;
-            }
 
             accumulateRep(regularShipRep, factionId, RTConfig.factionShipSaleReputationGain);
-
-        } else if (currentMarket.getFaction().isHostileTo(factionId)) {
-            accumulateRep(regularShipRep, factionId, RTConfig.factionShipSaleReputationLoss);
         }
+        else if (currentMarket.getFaction().isHostileTo(factionId))
+            accumulateRep(regularShipRep, factionId, RTConfig.factionShipSaleReputationLoss);
     }
 
-    // REWARDS
     private void applyAndShowRewards() {
         float totalCredits = rareShipCreditReward + regularShipCreditReward;
         float repChange = getMarketRepChange();
@@ -196,9 +180,8 @@ public class FactionShipBuyBack implements EveryFrameScript {
     }
 
     private void applyCredits(float credits) {
-        if (credits > 0) {
+        if (credits > 0)
             Global.getSector().getPlayerFleet().getCargo().getCredits().add(credits);
-        }
     }
 
     private void showIntel(float credits, float repChange) {
@@ -241,9 +224,7 @@ public class FactionShipBuyBack implements EveryFrameScript {
                 "Ship Buyback Program",
                 details,
                 currentMarket.getFaction().getId(),
-                currentMarket,
                 "Compensation issued for supporting war effort.",
-                Misc.getGrayColor(),
                 "Transaction Details",
                 "icons",
                 "rt_rebate_icon",
@@ -266,7 +247,6 @@ public class FactionShipBuyBack implements EveryFrameScript {
     }
 
     private void applyReputation(String factionId, float amount) {
-
         if (amount == 0f) return;
 
         CustomRepImpact impact = new CustomRepImpact();
