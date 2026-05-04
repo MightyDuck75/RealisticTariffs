@@ -99,6 +99,7 @@ public class RebateManager extends BaseCampaignEventListener {
                 "Tariff Rebate Issued",
                 details,
                 market.getFaction().getId(),
+                market.getId(),
                 sectionHeadingText,
                 sectionHeadingLabel,
                 "icons",
@@ -107,7 +108,8 @@ public class RebateManager extends BaseCampaignEventListener {
         );
 
         Global.getSector().getIntelManager().addIntel(intel, false);
-        intel.endAfterDelay(4f);
+        Global.getSector().addScript(intel);
+        intel.endAfterDelay(1f);
 
         try {
             Global.getSoundPlayer().playUISound("rt_exporters_rebate", 1f, 1f);

@@ -224,6 +224,7 @@ public class FactionShipBuyBack implements EveryFrameScript {
                 "Ship Buyback Program",
                 details,
                 currentMarket.getFaction().getId(),
+                currentMarket.getId(),
                 "Compensation issued for supporting war effort.",
                 "Transaction Details",
                 "icons",
@@ -232,11 +233,11 @@ public class FactionShipBuyBack implements EveryFrameScript {
         );
 
         Global.getSector().getIntelManager().addIntel(intel, false);
-        intel.endAfterDelay(4f);
+        Global.getSector().addScript(intel);
+        intel.endAfterDelay(1f);
     }
 
     private void applyAllReputation() {
-
         for (Map.Entry<String, Float> entry : regularShipRep.entrySet()) {
             applyReputation(entry.getKey(), entry.getValue());
         }
@@ -290,8 +291,7 @@ public class FactionShipBuyBack implements EveryFrameScript {
         }
         return (Set<String>) data.get(PERSISTENT_KEY);
     }
-
-    // FACTION DETECTION
+    
     private String getFactionOfRareFactionalShip(FleetMemberAPI ship) {
         String name = ship.getHullSpec().getHullName().toLowerCase();
         if (name.contains("xiv")) return Factions.HEGEMONY;

@@ -7,6 +7,8 @@ import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
+import org.apache.log4j.Logger;
+
 import java.awt.Color;
 import java.util.HashSet;
 import java.util.List;
@@ -23,10 +25,12 @@ public class IntelMessageNotification extends BaseIntelPlugin{
 
     private final String folder, icon;  // optional
 
-    private final String factionId;
+    private final String factionId, marketId;
     private final Boolean hasSecundarySectionHeading;
-
     private final Set<String> intelTags = new HashSet<>();
+
+    private static final Logger log = Global.getLogger(IntelMessageNotification.class);
+
 
     public IntelMessageNotification(
             String notificationTitle,
@@ -36,6 +40,7 @@ public class IntelMessageNotification extends BaseIntelPlugin{
             String title,
             List<ExpandedParagraphForIntel> detailLines,
             String factionId,
+            String marketId,
             String sectionHeadingText,
             String sectionHeadingLabel,
             String folder,
@@ -50,6 +55,7 @@ public class IntelMessageNotification extends BaseIntelPlugin{
         this.expandedParagraphs = detailLines;
         this.hasSecundarySectionHeading = true;
         this.factionId = factionId;
+        this.marketId = marketId;
         this.sectionHeadingText = sectionHeadingText;
         this.sectionHeadingLabel = sectionHeadingLabel;
         this.folder = folder;
@@ -76,6 +82,11 @@ public class IntelMessageNotification extends BaseIntelPlugin{
         return tags;
     }
 
+    public MarketAPI getMarket() {
+        if (marketId == null) return null;
+        return Global.getSector().getEconomy().getMarket(marketId);
+    }
+
     @Override
     public boolean isHidden() {
         return isEnded();
@@ -83,7 +94,7 @@ public class IntelMessageNotification extends BaseIntelPlugin{
 
     @Override
     public String getIcon() {
-        if(folder != "")
+        if (folder != null && !folder.isEmpty())
             return Global.getSettings().getSpriteName(folder, icon);
 
         return Global.getSector()
@@ -112,5 +123,10 @@ public class IntelMessageNotification extends BaseIntelPlugin{
         for (ExpandedParagraphForIntel para : expandedParagraphs) {
             info.addPara(para.text, opad, Misc.getTextColor(), para.colors, para.highlights);
         }
+    }
+
+    @Override
+    public void advance(float amount) {
+        super.advance(amount);
     }
 }
