@@ -19,7 +19,7 @@ public class ShipHullsWeaponsDemandEconomy {
         else {
             if (deficit >= highDemandTrigger)
                 demandBonus = RTConfig.shipsDemandHighSellPriceBoost;
-            else if (deficit == 1)
+            else if (deficit == minorDemandTrigger)
                 demandBonus = RTConfig.shipsDemandMinorSellPriceBoost;
             else
                 demandBonus = RTConfig.shipsDemandModerateSellPriceBoost;

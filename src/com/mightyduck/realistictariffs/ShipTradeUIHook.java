@@ -26,7 +26,7 @@ public class ShipTradeUIHook implements EveryFrameScript {
                 Global.getSettings().setFloat("shipSellPriceMult", RealisticTariffPlugin.getOriginalShipSellMult() + customSellMult);
                 Global.getSettings().setFloat("shipBuyPriceMult", RealisticTariffPlugin.getOriginalShipBuyMult() + customBuyMult);
 
-                isModified = true; // Flag to prevent running this every single frame
+                isModified = true; //Prevent running this every single frame
             }
         } else {
             // Safe keeping avoid going to another market with an old setting

@@ -101,24 +101,24 @@ public class TariffUpdater implements EveryFrameScript {
     }
 
     private void applyTariffChanges(MarketAPI market, float tariffReduction) {
-        float setTariffsToNormal = 0f;
-
+        //Remove previous adjustments to see the "clean" vanilla tariff
         market.getTariff().unmodify(MOD_ID);
 
-        if(market.getTariff().getModifiedValue() != RTConfig.normalTariff)
-            setTariffsToNormal = RTConfig.normalTariff - market.getTariff().getModifiedValue();
+        float cleanTariff = market.getTariff().getModifiedValue();
 
-        float currentTariff = market.getTariff().getModifiedValue();
+        //Calculate what our goal tariff is, start at our "Normal" and subtract the reduction from shortages
+        float desiredTariff = RTConfig.normalTariff - tariffReduction;
 
-        float potentialTariff = currentTariff - (Math.abs(setTariffsToNormal) + tariffReduction) ;
+        //This ensures not to go below as defined in the settings
+        float finalTargetTariff = Math.max(desiredTariff, RTConfig.lowestPossibleTariff);
 
-        float finalTargetTariff = Math.max(potentialTariff, RTConfig.lowestPossibleTariff);
+        float requiredAdjustment = finalTargetTariff - cleanTariff;
 
-        //Calculate the required Flat Modifier
-        float finalAdjustment = finalTargetTariff - currentTariff;
+        //Plus epsilon due to Java rounding floating accuracy
+        float finalAdjustment = requiredAdjustment + 0.0001f;
 
-        if (finalAdjustment != 0) {
+        //Apply the modifier only if there is a change
+        if (Math.abs(finalAdjustment) > 0.0001f)
             market.getTariff().modifyFlat(MOD_ID, finalAdjustment, "Realistic Tariffs Adjustment");
-        }
     }
 }

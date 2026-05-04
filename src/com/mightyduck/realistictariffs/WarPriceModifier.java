@@ -41,10 +41,10 @@ public class WarPriceModifier {
             //Safety: Don't count yourself as an enemy
             if (other == faction) continue;
 
-            // This automatically filters out Remnants, Derelicts, Omega, and Guardians.
+            //Filters out Remnants, Derelicts, Omega, and Guardians.
             if (!other.isShowInIntelTab()) continue;
 
-            // Maybe remove player faction? I think yes if player fleets attack and damages the faction markets
+            // TODO: Test Gameplay, maybe remove player faction? I think yes if player fleets attack and damages the faction markets
             if (other.isPlayerFaction() || other.isNeutralFaction()) continue;
 
             String id = other.getId();

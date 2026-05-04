@@ -69,7 +69,7 @@ public class RTConfig {
 
             normalTariff = (float) tariffs.optDouble("normalTariff", 0.18);
             lowestPossibleTariff = (float) tariffs.optDouble("lowestPossibleTariff", 0.03);
-            if (lowestPossibleTariff < 0)
+            if (lowestPossibleTariff < 0f)
                 lowestPossibleTariff = 0.03f;
 
             criticalTariffThreshold = (float) tariffs.optDouble("criticalTariffThreshold", 0.09);
@@ -129,6 +129,7 @@ public class RTConfig {
             // Multiple war boost
             shipMultipleWarsPricesBonus = (float) armaments.optDouble("shipMultipleWarsPricesBonus", 0.20);
             weaponsMultipleWarsPricesBonus = (float) armaments.optDouble("weaponsMultipleWarsPricesBonus", 0.20);
+
             //Ship & weapons Prices Max Multiplier over Base Price
             maxShipSellPriceMult = (float) armaments.optDouble("maxShipSellPriceMult", 1.3);
             maxShipBuyPriceMult = (float) armaments.optDouble("maxShipBuyPriceMult", 1.3);
