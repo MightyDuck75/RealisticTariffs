@@ -92,6 +92,31 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
         generateStatBullets(info, faction);
     }
 
+    @Override
+    public Set<String> getIntelTags(SectorMapAPI map) {
+        Set<String> tags = super.getIntelTags(map);
+        tags.add(market.getFaction().getId());
+
+        if (isImportant()) {
+            tags.add(Tags.INTEL_IMPORTANT);
+        }
+
+        tags.add(Tags.INTEL_TRADE);
+        return tags;
+    }
+
+    @Override
+    public boolean isImportant() {
+        return condition == ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL ||
+                condition == ShipHullsWeaponsIntelMarketCondition.DEMAND_MODERATE ||
+                condition == ShipHullsWeaponsIntelMarketCondition.WAR_MULTIPLE;
+    }
+
+    @Override
+    public Color getTitleColor(ListInfoMode mode) {
+        return Misc.getBasePlayerColor();
+    }
+
     private void generateNarrativeDescription(TooltipMakerAPI info, FactionAPI faction, float opad) {
         String mName = market.getName();
         String fName = faction.getDisplayName();
@@ -173,26 +198,6 @@ public class ShipHullsWeaponsMarketIntel extends BaseMarketIntel {
         info.addPara(" %s Selling Weapons", 0f, h, formatBoost(sellWeap));
         info.addPara(" %s Buying Ships", 0f, h, formatBoost(buyShip));
         info.addPara(" %s Buying Weapons", 0f, h, formatBoost(buyWeap));
-    }
-
-    @Override
-    public Set<String> getIntelTags(SectorMapAPI map) {
-        Set<String> tags = super.getIntelTags(map);
-        tags.add(market.getFaction().getId());
-
-        if (isImportant()) {
-            tags.add(Tags.INTEL_IMPORTANT);
-        }
-
-        tags.add(Tags.INTEL_TRADE);
-        return tags;
-    }
-
-    @Override
-    public boolean isImportant() {
-        return condition == ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL ||
-                condition == ShipHullsWeaponsIntelMarketCondition.DEMAND_MODERATE ||
-                condition == ShipHullsWeaponsIntelMarketCondition.WAR_MULTIPLE;
     }
 
     // --- Format Helpers ---

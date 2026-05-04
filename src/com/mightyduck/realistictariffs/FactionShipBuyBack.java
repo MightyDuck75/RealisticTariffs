@@ -291,7 +291,7 @@ public class FactionShipBuyBack implements EveryFrameScript {
         }
         return (Set<String>) data.get(PERSISTENT_KEY);
     }
-    
+
     private String getFactionOfRareFactionalShip(FleetMemberAPI ship) {
         String name = ship.getHullSpec().getHullName().toLowerCase();
         if (name.contains("xiv")) return Factions.HEGEMONY;
