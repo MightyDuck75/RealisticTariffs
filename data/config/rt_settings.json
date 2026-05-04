@@ -6,6 +6,7 @@
     "criticalTariffThreshold": 0.09,
     "severeTariffThreshold": 0.14,
     "numberOfCommoditiesInDeficitToTriggerIntel": 1,
+    "numberOfIllegalCommoditiesInDeficitToTriggerIntel": 1,
     "commoditiesSHIPSTariffImpact": 0.04,
     "commoditiesCREWTariffImpact": 0.02,
     "commoditiesDOMESTIC_GOODSTariffImpact": 0.05,

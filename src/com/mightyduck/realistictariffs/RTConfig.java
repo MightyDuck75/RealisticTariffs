@@ -14,6 +14,7 @@ public class RTConfig {
     public static float criticalTariffThreshold = 0.09f;
     public static float severeTariffThreshold = 0.14f;
     public static int intelTriggerThreshold = 1;
+    public static int intelIllicitTriggerThreshold = 1;
 
     public static float commoditiesSHIPSTariffImpact = 0.04f, commoditiesCREWTariffImpact = 0.01f, commoditiesDOMESTIC_GOODSTariffImpact = 0.05f,
             commoditiesFOODTariffImpact = 0.05f, commoditiesFUELTariffImpact = 0.05f, commoditiesHAND_WEAPONSTariffImpact = 0.03f,
@@ -75,6 +76,7 @@ public class RTConfig {
             criticalTariffThreshold = (float) tariffs.optDouble("criticalTariffThreshold", 0.09);
             severeTariffThreshold = (float) tariffs.optDouble("severeTariffThreshold", 0.14);
             intelTriggerThreshold = tariffs.optInt("numberOfCommoditiesInDeficitToTriggerIntel", 1);
+            intelIllicitTriggerThreshold = tariffs.optInt("numberOfIllegalCommoditiesInDeficitToTriggerIntel", 1);
 
             commoditiesSHIPSTariffImpact = (float) tariffs.optDouble("commoditiesSHIPSTariffImpact", 0.04);
             commoditiesCREWTariffImpact  = (float) tariffs.optDouble("commoditiesCREWTariffImpact", 0.02);

@@ -139,6 +139,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
             }
         }
 
-        hasOnlyIllegalGoodsDemand = (countNormalGoods == 0 && countIllegalGoods > 0);
+        hasOnlyIllegalGoodsDemand = (countNormalGoods < RTConfig.intelTriggerThreshold) &&
+                (countIllegalGoods >= RTConfig.intelIllicitTriggerThreshold);
     }
 }

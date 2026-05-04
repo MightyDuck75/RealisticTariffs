@@ -33,7 +33,6 @@ public class TariffUpdater implements EveryFrameScript {
     public void advance(float amount) {
         interval.advance(amount);
 
-        // Optimization not to run every frame
         if (!interval.intervalElapsed()) return;
 
         List<IntelInfoPlugin> activeIntelList = Global.getSector().getIntelManager().getIntel(DeficitTariffMarketIntel.class);
@@ -41,26 +40,63 @@ public class TariffUpdater implements EveryFrameScript {
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             if (!isValidMarket(market)) continue;
 
-            int totalShortages = 0;
+            int normalShortages = 0;
+            int illicitShortages = 0;
             float sumTariffReduction = 0;
 
             for (CommodityOnMarketAPI commodity : market.getCommoditiesCopy()) {
                 if(economicCommodities.contains(commodity.getId())) {
 
-                    // Check if it's an "essential" good (not illegal)
-                    String id = commodity.getId();
                     if (commodity.getMaxDemand() > commodity.getAvailable()){
-                        if (!id.equals(Commodities.DRUGS) && !id.equals(Commodities.ORGANS))
-                            sumTariffReduction += RTConfig.tariffImpacts.getOrDefault(commodity.getId(), 0f);
+                        String id = commodity.getId();
 
-                        totalShortages++;
+                        // Split the counting logic here
+                        if (id.equals(Commodities.DRUGS) || id.equals(Commodities.ORGANS)) {
+                            illicitShortages++;
+                        } else {
+                            sumTariffReduction += RTConfig.tariffImpacts.getOrDefault(id, 0f);
+                            normalShortages++;
+                        }
                     }
                 }
             }
 
             applyTariffChanges(market, sumTariffReduction);
 
-            handleIntel(market, totalShortages, activeIntelList);
+            // Pass both counters to the intel handler
+            handleIntel(market, normalShortages, illicitShortages, activeIntelList);
+        }
+    }
+
+    // Update the method signature to accept both shortage variables
+    private void handleIntel(MarketAPI market, int normalShortages, int illicitShortages, List<IntelInfoPlugin> activeIntelList) {
+        DeficitTariffMarketIntel existingIntel = null;
+
+        for (IntelInfoPlugin plugin : activeIntelList) {
+            DeficitTariffMarketIntel intel = (DeficitTariffMarketIntel) plugin;
+            if (intel.getMarket() != null && intel.getMarket().getId().equals(market.getId())) {
+                if (!intel.isEnded() && !intel.isEnding()) {
+                    existingIntel = intel;
+                    break;
+                }
+            }
+        }
+
+        // Determine if EITHER threshold is met
+        boolean shouldHaveIntel = (normalShortages >= RTConfig.intelTriggerThreshold) ||
+                (illicitShortages >= RTConfig.intelIllicitTriggerThreshold);
+
+        if (shouldHaveIntel && existingIntel == null) {
+            // Threshold met, Intel doesn't exist yet, create it.
+            Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
+
+        } else if (!shouldHaveIntel && existingIntel != null) {
+            // Neither threshold met, delete the intel.
+            existingIntel.endAfterDelay(0f);
+
+        } else if (existingIntel != null) {
+            // Intel exists and threshold is still met, refresh it.
+            existingIntel.refreshShortageStats();
         }
     }
 
@@ -91,11 +127,9 @@ public class TariffUpdater implements EveryFrameScript {
             Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
 
         } else if (totalShortages < RTConfig.intelTriggerThreshold && existingIntel != null) {
-            // FIX: If deficits are solved, this instantly deletes the intel.
             existingIntel.endAfterDelay(0f);
 
         } else if (existingIntel != null) {
-            // Force the intel to re-evaluate its stats so it can change titles/tabs!
             existingIntel.refreshShortageStats();
         }
     }
