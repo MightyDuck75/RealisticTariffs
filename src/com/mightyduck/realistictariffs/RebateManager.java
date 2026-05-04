@@ -38,19 +38,23 @@ public class RebateManager extends BaseCampaignEventListener {
         float currentTariff = market.getTariff().getModifiedValue();
         if (currentTariff <= 0f) return;
 
+        boolean transponderOn = Global.getSector().getPlayerFleet().isTransponderOn();
         float estimatedGrossSpent = 0f;
 
-        // 4. Calculate based ONLY on what was bought in this specific transaction
-        // transaction.getBought() returns a precise CargoAPI of just the purchased goods
         for (CargoStackAPI stack : transaction.getBought().getStacksCopy()) {
             if (stack.isCommodityStack()) {
                 String commodityId = stack.getCommodityId();
                 float qty = stack.getSize();
 
-                float basePrice = Global.getSettings().getCommoditySpec(commodityId).getBasePrice();
-                float priceWithTariff = basePrice * (1f + currentTariff);
+                float averageUnitPrice = (market.getSupplyPrice(commodityId, qty, transponderOn))/qty;
 
-                estimatedGrossSpent += (priceWithTariff * qty);
+                float totalBaseCost = averageUnitPrice * qty;
+
+                float exactTariffPaid = totalBaseCost * currentTariff;
+
+                float priceWithTariff = totalBaseCost + exactTariffPaid;
+
+                estimatedGrossSpent += priceWithTariff;
             }
         }
 
