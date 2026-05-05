@@ -228,7 +228,7 @@ public class FactionShipBuyBack implements EveryFrameScript {
                 "Compensation issued for supporting war effort.",
                 "Transaction Details",
                 "icons",
-                "rt_rebate_icon",
+                "ship_buyback_icon",
                 Tags.INTEL_LOCAL
         );
 
