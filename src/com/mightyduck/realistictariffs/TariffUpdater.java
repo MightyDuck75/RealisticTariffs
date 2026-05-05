@@ -63,7 +63,6 @@ public class TariffUpdater implements EveryFrameScript {
 
             applyTariffChanges(market, sumTariffReduction);
 
-            // Pass both counters to the intel handler
             handleIntel(market, normalShortages, illicitShortages, activeIntelList);
         }
     }
@@ -82,20 +81,17 @@ public class TariffUpdater implements EveryFrameScript {
             }
         }
 
-        // Determine if EITHER threshold is met
         boolean shouldHaveIntel = (normalShortages >= RTConfig.intelTriggerThreshold) ||
                 (illicitShortages >= RTConfig.intelIllicitTriggerThreshold);
 
         if (shouldHaveIntel && existingIntel == null) {
-            // Threshold met, Intel doesn't exist yet, create it.
             Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
 
+
         } else if (!shouldHaveIntel && existingIntel != null) {
-            // Neither threshold met, delete the intel.
             existingIntel.endAfterDelay(0f);
 
         } else if (existingIntel != null) {
-            // Intel exists and threshold is still met, refresh it.
             existingIntel.refreshShortageStats();
         }
     }

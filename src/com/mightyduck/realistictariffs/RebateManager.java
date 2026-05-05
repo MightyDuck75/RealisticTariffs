@@ -46,19 +46,18 @@ public class RebateManager extends BaseCampaignEventListener {
                 String commodityId = stack.getCommodityId();
                 float qty = stack.getSize();
 
-                float averageUnitPrice = (market.getSupplyPrice(commodityId, qty, transponderOn))/qty;
+                int averageUnitPrice = Math.round((market.getSupplyPrice(commodityId, qty, transponderOn))/qty);
 
-                float totalBaseCost = averageUnitPrice * qty;
+                int totalBaseCost = averageUnitPrice * Math.round(qty);
 
-                float exactTariffPaid = totalBaseCost * currentTariff;
+                int exactTariffPaid = Math.round(totalBaseCost * currentTariff);
 
-                float priceWithTariff = totalBaseCost + exactTariffPaid;
+                int priceWithTariff = totalBaseCost + exactTariffPaid;
 
                 estimatedGrossSpent += priceWithTariff;
             }
         }
 
-        // 5. Apply the rebate
         if (estimatedGrossSpent > 0f) {
             float taxPaid = estimatedGrossSpent * (currentTariff / (1f + currentTariff));
 
