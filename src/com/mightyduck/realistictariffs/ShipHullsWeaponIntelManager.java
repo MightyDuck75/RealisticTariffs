@@ -12,10 +12,12 @@ import com.fs.starfarer.api.util.IntervalUtil;
 
 import java.util.*;
 import java.util.List;
+import org.apache.log4j.Logger;
+
 
 public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     private final IntervalUtil tracker = new IntervalUtil(1f, 1f); // Check once per day
-
+    private org.apache.log4j.Logger log = Global.getLogger(ShipHullsWeaponIntelManager.class);
     // Define which factions have faction design ships for the buyback programs
     private final List<String> FACTION_SHIP_OWNERS = Arrays.asList(
             Factions.HEGEMONY, Factions.DIKTAT, Factions.TRITACHYON,
@@ -35,8 +37,8 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     }
 
     private void evaluateSectorConditions() {
-        // This ensures Faction-wide intel only appears ONCE per faction.
         Map<String, MarketAPI> representativeMarkets = new HashMap<>();
+
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             if (market.isHidden()) continue;
             String fId = market.getFactionId();
@@ -51,14 +53,20 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             if (market.isHidden() || market.getFaction().isPlayerFaction()) continue;
 
+            // AI says this could be the reason for a bug counting a station market and the planet market
+            if (market.getPrimaryEntity() == null ||
+                    market.getPrimaryEntity().getMarket() != market) {
+                continue;
+            }
+
             boolean isRepresentative = (market == representativeMarkets.get(market.getFactionId()));
-            List<ShipHullsWeaponsIntelMarketCondition> conditionsForThisMarket = determineConditions(market, isRepresentative);
+            List<ShipHullsWeaponsIntelMarketCondition> conditionsForThisMarket = determineConditionsCreateIntel(market, isRepresentative);
 
             syncIntelForMarket(market, conditionsForThisMarket);
         }
     }
 
-    private List<ShipHullsWeaponsIntelMarketCondition> determineConditions(MarketAPI market, boolean isRepresentative) {
+    private List<ShipHullsWeaponsIntelMarketCondition> determineConditionsCreateIntel(MarketAPI market, boolean isRepresentative) {
         List<ShipHullsWeaponsIntelMarketCondition> conditions = new ArrayList<>();
         FactionAPI faction = market.getFaction();
         String fId = faction.getId();
@@ -81,7 +89,7 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
                 conditions.add(ShipHullsWeaponsIntelMarketCondition.WAR_SINGLE);
 
             // Buyback program
-            if (activeWars > 0 && (!fId.equals(Factions.PERSEAN) || !fId.equals(Factions.DIKTAT))) {
+            if (activeWars > 0 && (!fId.equals(Factions.PERSEAN) && !fId.equals(Factions.DIKTAT))) {
                 switch(fId) {
                     case Factions.HEGEMONY:
                         if (FACTION_SHIP_OWNERS.contains(fId)) conditions.add(ShipHullsWeaponsIntelMarketCondition.FACTION_BUYBACK_HEGEMONY);
@@ -95,27 +103,28 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
                 }
             }
         }
+
         return conditions;
     }
 
     private void syncIntelForMarket(MarketAPI market, List<ShipHullsWeaponsIntelMarketCondition> activeConditions) {
-        // Find all existing intel for this market currently displayed to the player
         List<ShipHullsWeaponsMarketIntel> existingIntel = new ArrayList<>();
         for (IntelInfoPlugin plugin : Global.getSector().getIntelManager().getIntel(ShipHullsWeaponsMarketIntel.class)) {
             ShipHullsWeaponsMarketIntel intel = (ShipHullsWeaponsMarketIntel) plugin;
-            if (intel.getMarket() == market && !intel.isEnding() && !intel.isEnded()) {
-                existingIntel.add(intel);
+
+            if (intel.getMarket() != null && intel.getMarket().getId().equals(market.getId())) {
+                if (!intel.isEnding() && !intel.isEnded()) {
+                    existingIntel.add(intel);
+                }
             }
         }
 
-        // Clean up conditions that are no longer true
         for (ShipHullsWeaponsMarketIntel intel : existingIntel) {
-            if (!activeConditions.contains(intel.getCondition())) {
-                intel.endAfterDelay();
-            }
+            if (!activeConditions.contains(intel.getCondition()))
+                intel.endAfterDelay(0f);
         }
 
-        // Create new intel for conditions that just started
+        //The Update: Create intel for any condition that doesn't have a report yet
         for (ShipHullsWeaponsIntelMarketCondition condition : activeConditions) {
             boolean exists = false;
             for (ShipHullsWeaponsMarketIntel intel : existingIntel) {
