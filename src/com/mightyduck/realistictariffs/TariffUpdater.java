@@ -3,8 +3,8 @@ package com.mightyduck.realistictariffs;
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.util.IntervalUtil;
 import org.apache.log4j.Logger;
@@ -15,7 +15,8 @@ import java.util.List;
 public class TariffUpdater implements EveryFrameScript {
     public static final String MOD_ID = "realistictariffs";
     private static final Logger log = Global.getLogger(TariffUpdater.class);
-    private final IntervalUtil interval = new IntervalUtil(0.8f, 1.2f);
+    private final IntervalUtil interval = new IntervalUtil(2f, 3f);
+
     private final Set<String> economicCommodities = new HashSet<>(Arrays.asList(
             Commodities.SHIPS,Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
             Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
@@ -23,6 +24,7 @@ public class TariffUpdater implements EveryFrameScript {
             Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
             Commodities.VOLATILES, Commodities.DRUGS,Commodities.ORGANS
     ));
+
     @Override
     public boolean isDone() { return false; }
 
@@ -63,16 +65,19 @@ public class TariffUpdater implements EveryFrameScript {
 
             applyTariffChanges(market, sumTariffReduction);
 
-            handleIntel(market, normalShortages, illicitShortages, activeIntelList);
+            CommoditiesDeficitLevel severity = CommoditiesDeficitLevel.evaluate(market, normalShortages, illicitShortages);
+
+            handleIntel(market, severity, activeIntelList);
         }
     }
 
     // Update the method signature to accept both shortage variables
-    private void handleIntel(MarketAPI market, int normalShortages, int illicitShortages, List<IntelInfoPlugin> activeIntelList) {
+    private void handleIntel(MarketAPI market, CommoditiesDeficitLevel severity, List<IntelInfoPlugin> activeIntelList) {
         DeficitTariffMarketIntel existingIntel = null;
 
         for (IntelInfoPlugin plugin : activeIntelList) {
             DeficitTariffMarketIntel intel = (DeficitTariffMarketIntel) plugin;
+
             if (intel.getMarket() != null && intel.getMarket().getId().equals(market.getId())) {
                 if (!intel.isEnded() && !intel.isEnding()) {
                     existingIntel = intel;
@@ -81,14 +86,11 @@ public class TariffUpdater implements EveryFrameScript {
             }
         }
 
-        boolean shouldHaveIntel = (normalShortages >= RTConfig.intelTriggerThreshold) ||
-                (illicitShortages >= RTConfig.intelIllicitTriggerThreshold);
-
-        if (shouldHaveIntel && existingIntel == null) {
+        // The logic becomes incredibly simple:
+        if (severity != CommoditiesDeficitLevel.NONE && existingIntel == null) {
             Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
 
-
-        } else if (!shouldHaveIntel && existingIntel != null) {
+        } else if (severity == CommoditiesDeficitLevel.NONE && existingIntel != null) {
             existingIntel.endAfterDelay(0f);
 
         } else if (existingIntel != null) {
@@ -101,33 +103,6 @@ public class TariffUpdater implements EveryFrameScript {
             return false;
 
         return market.getId().equals(market.getPrimaryEntity().getMarket().getId());
-    }
-
-    private void handleIntel(MarketAPI market, int totalShortages, List<IntelInfoPlugin> activeIntelList) {
-        DeficitTariffMarketIntel existingIntel = null;
-
-        for (IntelInfoPlugin plugin : activeIntelList) {
-
-            DeficitTariffMarketIntel intel = (DeficitTariffMarketIntel) plugin;
-
-            if (intel.getMarket() != null && intel.getMarket().getId().equals(market.getId())) {
-                if (!intel.isEnded() && !intel.isEnding()) {
-                    existingIntel = intel;
-                    break;
-                }
-            }
-        }
-
-        if (totalShortages >= RTConfig.intelTriggerThreshold && existingIntel == null) {
-            // Intel doesn't exist yet, create it.
-            Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
-
-        } else if (totalShortages < RTConfig.intelTriggerThreshold && existingIntel != null) {
-            existingIntel.endAfterDelay(0f);
-
-        } else if (existingIntel != null) {
-            existingIntel.refreshShortageStats();
-        }
     }
 
     private void applyTariffChanges(MarketAPI market, float tariffReduction) {

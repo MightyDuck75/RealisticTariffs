@@ -12,7 +12,6 @@ import com.fs.starfarer.api.util.IntervalUtil;
 
 import java.util.*;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 
 public class ShipHullsWeaponIntelManager implements EveryFrameScript {
@@ -81,7 +80,7 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
 
         // 2. War Logic
         if (isRepresentative && !fId.equals(Factions.PIRATES) && !fId.equals(Factions.LUDDIC_PATH)){
-            int activeWars = getActiveWarCount(market.getFaction());
+            int activeWars = WarPriceModifier.getActiveFactionalWars(market.getFaction());
 
             if (activeWars > 1)
                 conditions.add(ShipHullsWeaponsIntelMarketCondition.WAR_MULTIPLE);
@@ -137,29 +136,6 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
             if (!exists)
                 Global.getSector().getIntelManager().addIntel(new ShipHullsWeaponsMarketIntel(market, condition));
         }
-    }
-
-    private int getActiveWarCount(FactionAPI faction) {
-        int countFactionWars = 0;
-        for (FactionAPI other : Global.getSector().getAllFactions()) {
-            //Don't countFactionWars yourself as an enemy
-            if (other == faction) continue;
-
-            //Filters out Remnants, Derelicts, Omega, and Guardians.
-            if (!other.isShowInIntelTab()) continue;
-
-            //Dont count player faction and independents market
-            if (other.isPlayerFaction() || other.isNeutralFaction()) continue;
-
-            //Ignore pirates and terrorists
-            String id = other.getId();
-            if (id.equals(Factions.PIRATES) || id.equals(Factions.LUDDIC_PATH)) continue;
-
-            if (faction.isHostileTo(other))
-                countFactionWars++;
-        }
-
-        return countFactionWars;
     }
 
     @Override public boolean isDone() { return false; }

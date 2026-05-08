@@ -1,7 +1,8 @@
 {
   "graphics":{
     "icons":{
-      "rt_rebate_icon":"graphics/icons/intel/rebate_icon.png"
+      "rt_rebate_icon":"graphics/icons/intel/rebate_icon.png",
+      "ship_buyback_icon":"graphics/icons/intel/ship_buyback_icon.png"
     }
   }
 }

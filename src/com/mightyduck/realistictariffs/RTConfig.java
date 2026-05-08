@@ -16,12 +16,12 @@ public class RTConfig {
     public static int intelTriggerThreshold = 1;
     public static int intelIllicitTriggerThreshold = 1;
 
-    public static float commoditiesSHIPSTariffImpact = 0.04f, commoditiesCREWTariffImpact = 0.01f, commoditiesDOMESTIC_GOODSTariffImpact = 0.05f,
+    public static float commoditiesSHIPSTariffImpact = 0.04f, commoditiesCREWTariffImpact = 0.02f, commoditiesDOMESTIC_GOODSTariffImpact = 0.05f,
             commoditiesFOODTariffImpact = 0.05f, commoditiesFUELTariffImpact = 0.05f, commoditiesHAND_WEAPONSTariffImpact = 0.03f,
             commoditiesHEAVY_MACHINERYTariffImpact = 0.04f,
             commoditiesLOBSTERTariffImpact = 0.01f, commoditiesLUXURY_GOODSTariffImpact = 0.03f, commoditiesMARINESTariffImpact = 0.01f,
             commoditiesMETALSTariffImpact = 0.04f,
-            commoditiesORETariffImpact = 0.03f, commoditiesORGANICSTariffImpact = 0.05f, commoditiesRARE_METALSTariffImpact = 0.03f,
+            commoditiesORETariffImpact = 0.03f, commoditiesORGANICSTariffImpact = 0.04f, commoditiesRARE_METALSTariffImpact = 0.03f,
             commoditiesRARE_ORETariffImpact = 0.3f,
             commoditiesSUPPLIESTariffImpact = 0.05f, commoditiesVOLATILESTariffImpact = 0.03f;
 
@@ -39,6 +39,9 @@ public class RTConfig {
     public static float factionShipSellBonus = 0.10f;
     public static float factionShipSaleReputationGain = 0.01f;
     public static float factionShipSaleReputationLoss = -0.01f;
+    public static int minorShipDeficitThreshold = 1;
+    public static int severeShipDeficitThreshold = 2;
+    public static int criticalShipDeficitThreshold = 3;
     public static float weaponsDemandMinorSellPriceBoost = 0.10f;
     public static float weaponsDemandModerateSellPriceBoost = 0.20f;
     public static float weaponsDemandHighSellPriceBoost = 0.40f;
@@ -114,6 +117,10 @@ public class RTConfig {
             factionShipSellBonus = (float) armaments.optDouble("factionShipSellBonus", 0.10);
             factionShipSaleReputationGain = (float)armaments.optDouble("factionShipSaleReputationGain", 0.01);
             factionShipSaleReputationLoss = (float)armaments.optDouble("factionShipSaleReputationLoss", -0.01);
+
+            minorShipDeficitThreshold = tariffs.optInt("severeTariffThreshold", 1);
+            severeShipDeficitThreshold = tariffs.optInt("severeTariffThreshold", 2);
+            criticalShipDeficitThreshold = tariffs.optInt("criticalTariffThreshold", 3);
 
             // Weapons Selling Price boost
             weaponsDemandMinorSellPriceBoost = (float) armaments.optDouble("weaponsDemandMinorSellPriceBoost", 0.10);
