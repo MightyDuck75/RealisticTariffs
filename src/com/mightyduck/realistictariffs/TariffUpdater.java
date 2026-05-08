@@ -71,7 +71,6 @@ public class TariffUpdater implements EveryFrameScript {
         }
     }
 
-    // Update the method signature to accept both shortage variables
     private void handleIntel(MarketAPI market, CommoditiesDeficitLevel severity, List<IntelInfoPlugin> activeIntelList) {
         DeficitTariffMarketIntel existingIntel = null;
 
@@ -86,7 +85,6 @@ public class TariffUpdater implements EveryFrameScript {
             }
         }
 
-        // The logic becomes incredibly simple:
         if (severity != CommoditiesDeficitLevel.NONE && existingIntel == null) {
             Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
 

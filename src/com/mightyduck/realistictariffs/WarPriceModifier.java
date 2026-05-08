@@ -9,11 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WarPriceModifier {
-
     private static final Map<String, Integer> warCache = new HashMap<>();
     private static long lastCacheTime = 0;
     private static final long CACHE_DURATION = 86400L; // 1 game day
-
 
     public static float getShipWarMultiplier(MarketAPI market) {
         FactionAPI faction = market.getFaction();
@@ -35,7 +33,7 @@ public class WarPriceModifier {
 
         if (wars <= 0) return 0f;
 
-        if(wars == 1)
+        if (wars == 1)
             return RTConfig.weaponsWarPricesBonus;
         else
             return RTConfig.weaponsMultipleWarsPricesBonus;

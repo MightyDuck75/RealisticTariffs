@@ -118,9 +118,9 @@ public class RTConfig {
             factionShipSaleReputationGain = (float)armaments.optDouble("factionShipSaleReputationGain", 0.01);
             factionShipSaleReputationLoss = (float)armaments.optDouble("factionShipSaleReputationLoss", -0.01);
 
-            minorShipDeficitThreshold = tariffs.optInt("severeTariffThreshold", 1);
-            severeShipDeficitThreshold = tariffs.optInt("severeTariffThreshold", 2);
-            criticalShipDeficitThreshold = tariffs.optInt("criticalTariffThreshold", 3);
+            minorShipDeficitThreshold = tariffs.optInt("minorShipHullsWeaponsDeficitThreshold", 1);
+            severeShipDeficitThreshold = tariffs.optInt("severeShipHullsWeaponsDeficitThreshold", 2);
+            criticalShipDeficitThreshold = tariffs.optInt("criticalShipHullsWeaponsDeficitThreshold", 3);
 
             // Weapons Selling Price boost
             weaponsDemandMinorSellPriceBoost = (float) armaments.optDouble("weaponsDemandMinorSellPriceBoost", 0.10);
