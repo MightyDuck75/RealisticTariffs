@@ -11,6 +11,8 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import static com.mightyduck.realistictariffs.RTConfig.ECONOMIC_LEGAL_COMMODITIES;
+
 public class DeficitTariffMarketIntel extends BaseMarketIntel {
     private final Color blueIntelTitleColor, goldHighlightColor, grayTextColor;
 
@@ -24,13 +26,13 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
 
     private CommoditiesDeficitLevel currentSeverity = CommoditiesDeficitLevel.NONE;
 
-    public DeficitTariffMarketIntel(MarketAPI market) {
+    public DeficitTariffMarketIntel(MarketAPI market, CommoditiesDeficitLevel initialSeverity) {
         super(market);
         this.blueIntelTitleColor = Misc.getBasePlayerColor();
         this.goldHighlightColor = Misc.getHighlightColor();
         this.grayTextColor = Misc.getGrayColor();
 
-        refreshShortageStats(); // Calculate once on start
+        this.currentSeverity = initialSeverity;
     }
 
     @Override
@@ -113,20 +115,7 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
         return tags;
     }
 
-    public void refreshShortageStats() {
-        int normalCommodities = 0;
-        int illicitCommodities = 0;
-
-        for (CommodityOnMarketAPI commMkrt : market.getCommoditiesCopy()) {
-            if (commMkrt.getMaxDemand() > commMkrt.getAvailable()) {
-                String id = commMkrt.getId();
-                if (ecoCommodities.contains(id))
-                    normalCommodities++;
-                else if (id.equals(Commodities.ORGANS) || id.equals(Commodities.DRUGS))
-                    illicitCommodities++;
-            }
-        }
-
-        this.currentSeverity = CommoditiesDeficitLevel.evaluate(market, normalCommodities, illicitCommodities);
+    public void updateSeverity(CommoditiesDeficitLevel newSeverity) {
+        this.currentSeverity = newSeverity;
     }
 }

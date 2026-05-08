@@ -18,10 +18,10 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     private final IntervalUtil tracker = new IntervalUtil(1f, 1f); // Check once per day
     private org.apache.log4j.Logger log = Global.getLogger(ShipHullsWeaponIntelManager.class);
     // Define which factions have faction design ships for the buyback programs
-    private final List<String> FACTION_SHIP_OWNERS = Arrays.asList(
+    private static final Set<String> FACTION_SHIP_OWNERS = new HashSet<>(Arrays.asList(
             Factions.HEGEMONY, Factions.DIKTAT, Factions.TRITACHYON,
             Factions.PERSEAN, Factions.LUDDIC_CHURCH, Factions.LUDDIC_PATH, Factions.PIRATES
-    );
+    ));
 
     private final int minorDeficitTrigger = 1, moderateDeficitTrigger = 2, highDeficitTrigger = 3;
 
@@ -36,33 +36,60 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     }
 
     private void evaluateSectorConditions() {
-        Map<String, MarketAPI> representativeMarkets = new HashMap<>();
+        performRetroactiveCleanup();
+
+        Map<String, MarketAPI> topMarkets = calculateRepresentativeMarkets();
 
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
-            if (market.isHidden()) continue;
-            String fId = market.getFactionId();
+            if (!RTUtils.isValidPrimaryMarket(market)) continue;
 
-            if (!representativeMarkets.containsKey(fId) ||
-                    market.getSize() > representativeMarkets.get(fId).getSize()) {
-                representativeMarkets.put(fId, market);
-            }
+            boolean isRepresentative = (market == topMarkets.get(market.getFactionId()));
+
+            // Determine and create intel
+            List<ShipHullsWeaponsIntelMarketCondition> state = determineConditionsCreateIntel(market, isRepresentative);
+            syncIntelForMarket(market, state);
         }
+    }
 
-        // Loop through all markets and determine which intel they should have
-        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
-            if (market.isHidden() || market.getFaction().isPlayerFaction()) continue;
+    private void performRetroactiveCleanup(){
+        List<IntelInfoPlugin> activeIntel = Global.getSector().getIntelManager().getIntel(ShipHullsWeaponsMarketIntel.class);
 
-            // AI says this could be the reason for a bug counting a station market and the planet market
-            if (market.getPrimaryEntity() == null ||
-                    market.getPrimaryEntity().getMarket() != market) {
+        for (IntelInfoPlugin plugin : activeIntel) {
+            ShipHullsWeaponsMarketIntel intel = (ShipHullsWeaponsMarketIntel) plugin;
+
+            //Safety check: Is the market gone?
+            if (intel.getMarket() == null || !intel.getMarket().isInEconomy()) {
+                intel.endAfterDelay(0f);
                 continue;
             }
 
-            boolean isRepresentative = (market == representativeMarkets.get(market.getFactionId()));
-            List<ShipHullsWeaponsIntelMarketCondition> conditionsForThisMarket = determineConditionsCreateIntel(market, isRepresentative);
+            //Logic check: Is the faction no longer one we track?
+            if (!FACTION_SHIP_OWNERS.contains(intel.getMarket().getFactionId())) {
+                intel.endAfterDelay(0f);
+            }
 
-            syncIntelForMarket(market, conditionsForThisMarket);
+            if (intel.getMarket().getFaction().isPlayerFaction()) {
+                intel.endAfterDelay(0f);
+            }
         }
+    }
+
+    private Map<String, MarketAPI> calculateRepresentativeMarkets() {
+        Map<String, MarketAPI> factionMainMarkets = new HashMap<>();
+
+        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
+            if (!RTUtils.isValidPrimaryMarket(market)) continue;
+
+            String factionId = market.getFactionId();
+
+            // If we haven't seen this faction yet, or this market is bigger than the one we saved
+            if (!factionMainMarkets.containsKey(factionId) ||
+                    market.getSize() > factionMainMarkets.get(factionId).getSize()) {
+
+                factionMainMarkets.put(factionId, market);
+            }
+        }
+        return factionMainMarkets;
     }
 
     private List<ShipHullsWeaponsIntelMarketCondition> determineConditionsCreateIntel(MarketAPI market, boolean isRepresentative) {
@@ -71,7 +98,6 @@ public class ShipHullsWeaponIntelManager implements EveryFrameScript {
         String fId = faction.getId();
         CommodityOnMarketAPI ships = market.getCommodityData(Commodities.SHIPS);
 
-        // 1. Ship Deficit Logic
         int shipDeficit = ships.getMaxDemand() - ships.getAvailable();
 
         if (shipDeficit >= highDeficitTrigger) conditions.add(ShipHullsWeaponsIntelMarketCondition.DEMAND_CRITICAL);

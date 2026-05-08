@@ -9,7 +9,6 @@ public enum CommoditiesDeficitLevel {
     SEVERE,
     CRITICAL;
 
-
     public static CommoditiesDeficitLevel evaluate(MarketAPI market, int numberOfShortages, int illicitShortages) {
         boolean meetsNormal = numberOfShortages >= RTConfig.intelTriggerThreshold;
         boolean meetsIllicit = illicitShortages >= RTConfig.intelIllicitTriggerThreshold;

@@ -7,6 +7,21 @@ import java.util.*;
 
 public class RTConfig {
 
+    //Constants
+    public static final Set<String> ECONOMIC_COMMODITIES = new HashSet<>(Arrays.asList(
+            Commodities.SHIPS,Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
+            Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
+            Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
+            Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
+            Commodities.VOLATILES, Commodities.DRUGS,Commodities.ORGANS));
+
+    public static final Set<String> ECONOMIC_LEGAL_COMMODITIES = new HashSet<>(Arrays.asList(
+            Commodities.SHIPS,Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
+            Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
+            Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
+            Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
+            Commodities.VOLATILES));
+
     // --- Tariffs ---
     public static boolean isExportRebateActive = true;
     public static float normalTariff = 0.18f;
@@ -15,6 +30,7 @@ public class RTConfig {
     public static float severeTariffThreshold = 0.14f;
     public static int intelTriggerThreshold = 1;
     public static int intelIllicitTriggerThreshold = 1;
+
 
     public static float commoditiesSHIPSTariffImpact = 0.04f, commoditiesCREWTariffImpact = 0.02f, commoditiesDOMESTIC_GOODSTariffImpact = 0.05f,
             commoditiesFOODTariffImpact = 0.05f, commoditiesFUELTariffImpact = 0.05f, commoditiesHAND_WEAPONSTariffImpact = 0.03f,

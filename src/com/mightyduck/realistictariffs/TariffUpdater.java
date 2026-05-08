@@ -9,21 +9,14 @@ import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.util.IntervalUtil;
 import org.apache.log4j.Logger;
 
-import java.util.*;
 import java.util.List;
+
+import static com.mightyduck.realistictariffs.RTConfig.ECONOMIC_COMMODITIES;
 
 public class TariffUpdater implements EveryFrameScript {
     public static final String MOD_ID = "realistictariffs";
     private static final Logger log = Global.getLogger(TariffUpdater.class);
     private final IntervalUtil interval = new IntervalUtil(2f, 3f);
-
-    private final Set<String> economicCommodities = new HashSet<>(Arrays.asList(
-            Commodities.SHIPS,Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
-            Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
-            Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
-            Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
-            Commodities.VOLATILES, Commodities.DRUGS,Commodities.ORGANS
-    ));
 
     @Override
     public boolean isDone() { return false; }
@@ -47,12 +40,11 @@ public class TariffUpdater implements EveryFrameScript {
             float sumTariffReduction = 0;
 
             for (CommodityOnMarketAPI commodity : market.getCommoditiesCopy()) {
-                if(economicCommodities.contains(commodity.getId())) {
+                if(ECONOMIC_COMMODITIES.contains(commodity.getId())) {
 
                     if (commodity.getMaxDemand() > commodity.getAvailable()){
                         String id = commodity.getId();
 
-                        // Split the counting logic here
                         if (id.equals(Commodities.DRUGS) || id.equals(Commodities.ORGANS)) {
                             illicitShortages++;
                         } else {
@@ -86,13 +78,13 @@ public class TariffUpdater implements EveryFrameScript {
         }
 
         if (severity != CommoditiesDeficitLevel.NONE && existingIntel == null) {
-            Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market));
+            Global.getSector().getIntelManager().addIntel(new DeficitTariffMarketIntel(market, severity));
 
         } else if (severity == CommoditiesDeficitLevel.NONE && existingIntel != null) {
             existingIntel.endAfterDelay(0f);
 
         } else if (existingIntel != null) {
-            existingIntel.refreshShortageStats();
+            existingIntel.updateSeverity(severity);
         }
     }
 
@@ -104,24 +96,26 @@ public class TariffUpdater implements EveryFrameScript {
     }
 
     private void applyTariffChanges(MarketAPI market, float tariffReduction) {
-        //Remove previous adjustments to see the "clean" vanilla tariff
-        market.getTariff().unmodify(MOD_ID);
+        float currentTotalTariff = market.getTariff().getModifiedValue();
+        float ourCurrentModValue = 0f;
 
-        float cleanTariff = market.getTariff().getModifiedValue();
+        // Check if our modifier already exists to subtract it accurately
+        if (market.getTariff().getFlatStatMod(MOD_ID) != null)
+            ourCurrentModValue = market.getTariff().getFlatStatMod(MOD_ID).value;
 
-        //Calculate what our goal tariff is, start at our "Normal" and subtract the reduction from shortages
+        float cleanTariff = currentTotalTariff - ourCurrentModValue;
+
+        // Calculate the target
         float desiredTariff = RTConfig.normalTariff - tariffReduction;
-
-        //This ensures not to go below as defined in the settings
         float finalTargetTariff = Math.max(desiredTariff, RTConfig.lowestPossibleTariff);
 
-        float requiredAdjustment = finalTargetTariff - cleanTariff;
+        // We check if the difference is significant to avoid unnecessary recalculations
+        if (Math.abs(currentTotalTariff - finalTargetTariff) > 0.001f) {
+            market.getTariff().unmodify(MOD_ID);
 
-        //Plus epsilon due to Java rounding floating accuracy
-        float finalAdjustment = requiredAdjustment + 0.0001f;
+            float requiredAdjustment = finalTargetTariff - cleanTariff;
 
-        //Apply the modifier only if there is a change
-        if (Math.abs(finalAdjustment) > 0.0001f)
-            market.getTariff().modifyFlat(MOD_ID, finalAdjustment, "Realistic Tariffs Adjustment");
+            market.getTariff().modifyFlat(MOD_ID, requiredAdjustment, "Local economic conditions");
+        }
     }
 }
