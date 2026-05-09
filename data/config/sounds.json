@@ -1,5 +1,8 @@
 {
   "rt_exporters_rebate": [
     {"file":"sounds/ui/rt_exporters_rebate.ogg","pitch":1,"volume":1}
+  ],
+    "rt_critical_deficits": [
+    {"file":"sounds/ui/rt_critical_deficits.ogg","pitch":1,"volume":1}
   ]
 }

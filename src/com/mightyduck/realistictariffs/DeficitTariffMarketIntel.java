@@ -1,4 +1,5 @@
 package com.mightyduck.realistictariffs;
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
@@ -9,22 +10,13 @@ import com.fs.starfarer.api.util.Misc;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
-
-import static com.mightyduck.realistictariffs.RTConfig.ECONOMIC_LEGAL_COMMODITIES;
 
 public class DeficitTariffMarketIntel extends BaseMarketIntel {
+
+    private static long lastSoundPlayedTime = 0;
+    private static final long SOUND_DELAY_MS = 1000;
     private final Color blueIntelTitleColor, goldHighlightColor, grayTextColor;
-
-    private List<String> ecoCommodities = Arrays.asList(
-            Commodities.SHIPS, Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
-            Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
-            Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
-            Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
-            Commodities.VOLATILES
-    );
-
-    private CommoditiesDeficitLevel currentSeverity = CommoditiesDeficitLevel.NONE;
+    private CommoditiesDeficitLevel currentSeverity;
 
     public DeficitTariffMarketIntel(MarketAPI market, CommoditiesDeficitLevel initialSeverity) {
         super(market);
@@ -33,6 +25,9 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
         this.grayTextColor = Misc.getGrayColor();
 
         this.currentSeverity = initialSeverity;
+
+        if (this.currentSeverity == CommoditiesDeficitLevel.CRITICAL)
+            playCriticalSound();
     }
 
     @Override
@@ -117,5 +112,29 @@ public class DeficitTariffMarketIntel extends BaseMarketIntel {
 
     public void updateSeverity(CommoditiesDeficitLevel newSeverity) {
         this.currentSeverity = newSeverity;
+
+        if (newSeverity == CommoditiesDeficitLevel.CRITICAL && this.currentSeverity != CommoditiesDeficitLevel.CRITICAL) {
+            playCriticalSound();
+
+            try {
+                Global.getSoundPlayer().playUISound("rt_critical_deficits", 1f, 1f);
+            } catch (Exception e) {
+                Global.getLogger(DeficitTariffMarketIntel.class).error("Failed to play rebate UI sound!", e);
+            }
+        }
+    }
+
+    private void playCriticalSound() {
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - lastSoundPlayedTime > SOUND_DELAY_MS) {
+            try {
+                Global.getSoundPlayer().playUISound("rt_critical_deficits", 1f, 1f);
+            } catch (Exception e) {
+                Global.getLogger(DeficitTariffMarketIntel.class).error("Failed to play rebate UI sound!", e);
+            }
+
+            lastSoundPlayedTime = currentTime;
+        }
     }
 }
