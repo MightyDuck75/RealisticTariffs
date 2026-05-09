@@ -24,7 +24,7 @@ public class RebateManager extends BaseCampaignEventListener {
         SubmarketAPI submarket = transaction.getSubmarket();
         MarketAPI market = transaction.getMarket();
 
-        // 1. Safety checks
+        //Safety checks
         if (submarket == null || market == null) return;
 
         // Exclude storage and backmarket for getting rebates

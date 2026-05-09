@@ -7,7 +7,6 @@ import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
-import org.apache.log4j.Logger;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -22,15 +21,10 @@ public class IntelMessageNotification extends BaseIntelPlugin{
     private final List<ExpandedParagraphForIntel> expandedParagraphs;
     private final String sectionHeadingText;  // optional
     private final String sectionHeadingLabel;  // optional
-
     private final String folder, icon;  // optional
-
     private final String factionId, marketId;
     private final Boolean hasSecundarySectionHeading;
     private final Set<String> intelTags = new HashSet<>();
-
-    private static final Logger log = Global.getLogger(IntelMessageNotification.class);
-
 
     public IntelMessageNotification(
             String notificationTitle,

@@ -68,7 +68,7 @@ public class RealisticTariffPlugin extends BaseModPlugin {
 
     @Override
     public void afterGameSave() {
-        // 3. The save is complete. Put the intel back so the player doesn't notice!
+        // The save is complete. Put the intel back so the player doesn't notice!
         IntelManagerAPI intelManager = Global.getSector().getIntelManager();
 
         if (backUpShipWeaponsIntelForSaveCompatibility != null) {

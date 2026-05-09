@@ -15,13 +15,6 @@ public class RTConfig {
             Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
             Commodities.VOLATILES, Commodities.DRUGS,Commodities.ORGANS));
 
-    public static final Set<String> ECONOMIC_LEGAL_COMMODITIES = new HashSet<>(Arrays.asList(
-            Commodities.SHIPS,Commodities.CREW, Commodities.DOMESTIC_GOODS, Commodities.FOOD,
-            Commodities.FUEL, Commodities.HAND_WEAPONS, Commodities.HEAVY_MACHINERY, Commodities.LOBSTER,
-            Commodities.LUXURY_GOODS, Commodities.MARINES, Commodities.METALS, Commodities.ORE,
-            Commodities.ORGANICS, Commodities.RARE_METALS, Commodities.RARE_ORE, Commodities.SUPPLIES,
-            Commodities.VOLATILES));
-
     // --- Tariffs ---
     public static boolean isExportRebateActive = true;
     public static float normalTariff = 0.18f;
@@ -64,12 +57,12 @@ public class RTConfig {
     public static float weaponsDemandMinorBuyPriceBoost = 0.15f;
     public static float weaponsDemandModerateBuyPriceBoost = 0.25f;
     public static float weaponsDemandHighBuyPriceBoost = 0.45f;
+
     // --- Wars ---
     public static float shipWarPricesBonus = 0.10f;
     public static float weaponsWarPricesBonus = 0.10f;
     public static float shipMultipleWarsPricesBonus = 0.20f;
     public static float weaponsMultipleWarsPricesBonus = 0.20f;
-
     public static float maxShipSellPriceMult = 1.3f, maxShipBuyPriceMult = 1.3f,
             maxWeaponSellPriceMult = 1.3f, maxWeaponBuyPriceMult = 1.3f;
 
@@ -77,10 +70,8 @@ public class RTConfig {
 
     public static void loadSettings() {
         try {
-            // Load the JSON file from your mod's data/config folder
             JSONObject settings = Global.getSettings().loadJSON("data/config/rt_settings.json");
 
-            // Extract the sub-objects
             JSONObject tariffs = settings.getJSONObject("Tariff Commodity Demand Values");
             JSONObject armaments = settings.getJSONObject("Ship & Armaments Values");
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ShipHullsWeaponIntelManager implements EveryFrameScript {
     private final IntervalUtil tracker = new IntervalUtil(1f, 1f); // Check once per day
-    private org.apache.log4j.Logger log = Global.getLogger(ShipHullsWeaponIntelManager.class);
+
     // Define which factions have faction design ships for the buyback programs
     private static final Set<String> FACTION_SHIP_OWNERS = new HashSet<>(Arrays.asList(
             Factions.HEGEMONY, Factions.DIKTAT, Factions.TRITACHYON,

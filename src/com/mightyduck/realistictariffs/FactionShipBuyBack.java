@@ -15,7 +15,6 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.impl.campaign.DModManager;
 import com.fs.starfarer.api.impl.campaign.ids.Submarkets;
 
-import org.apache.log4j.Logger;
 import java.awt.Color;
 import java.util.*;
 
@@ -28,7 +27,6 @@ public class FactionShipBuyBack implements EveryFrameScript {
     private final Map<String, Float> rareShipRep = new HashMap<>();
     private final Map<String, Float> regularShipRep = new HashMap<>();
     private static final String PERSISTENT_KEY = "md_ship_buyback_tracker";
-    private static final Logger log = Global.getLogger(FactionShipBuyBack.class);
 
     @Override
     public boolean isDone() {
@@ -283,7 +281,6 @@ public class FactionShipBuyBack implements EveryFrameScript {
         regularShipCreditReward = 0f;
     }
 
-    @SuppressWarnings("unchecked")
     private Set<String> getHistory() {
         Map<String, Object> data = Global.getSector().getPersistentData();
         if (!data.containsKey(PERSISTENT_KEY)) {

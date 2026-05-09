@@ -7,7 +7,6 @@ import com.fs.starfarer.api.campaign.econ.CommodityOnMarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.util.IntervalUtil;
-import org.apache.log4j.Logger;
 
 import java.util.List;
 
@@ -15,7 +14,6 @@ import static com.mightyduck.realistictariffs.RTConfig.ECONOMIC_COMMODITIES;
 
 public class TariffUpdater implements EveryFrameScript {
     public static final String MOD_ID = "realistictariffs";
-    private static final Logger log = Global.getLogger(TariffUpdater.class);
     private final IntervalUtil interval = new IntervalUtil(2f, 3f);
 
     @Override

@@ -5,16 +5,13 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 
-import org.apache.log4j.Logger;
-
 public class WeaponPriceUIHook implements EveryFrameScript {
-    private static final Logger log = Global.getLogger(WeaponPriceUIHook.class);
 
     @Override
     public void advance(float amount) {
         InteractionDialogAPI dialog = Global.getSector().getCampaignUI().getCurrentInteractionDialog();
 
-        // 2. If the player is interacting with a market, apply the "War Surcharge"
+        // If the player is interacting with a market, apply the war price inflation
         if (dialog != null && dialog.getInteractionTarget() != null && dialog.getInteractionTarget().getMarket() != null) {
             MarketAPI market = dialog.getInteractionTarget().getMarket();
 
