@@ -108,11 +108,11 @@ public class RTConfig {
 
             // Ships Price Boosts
             shipsDemandMinorSellPriceBoost = (float) armaments.optDouble("shipsDemandMinorSellPriceBoost", 0.20);
-            shipsDemandModerateSellPriceBoost = (float) armaments.optDouble("shipsDemandModerateSellPriceBoost", 0.6);
-            shipsDemandHighSellPriceBoost = (float) armaments.optDouble("shipsDemandHighSellPriceBoost", 1.0);
-            shipsDemandMinorBuyPriceBoost = (float) armaments.optDouble("shipsDemandMinorBuyPriceBoost", 0.25);
+            shipsDemandModerateSellPriceBoost = (float) armaments.optDouble("shipsDemandModerateSellPriceBoost", 0.5);
+            shipsDemandHighSellPriceBoost = (float) armaments.optDouble("shipsDemandHighSellPriceBoost", 1.25);
+            shipsDemandMinorBuyPriceBoost = (float) armaments.optDouble("shipsDemandMinorBuyPriceBoost", 0.30);
             shipsDemandModerateBuyPriceBoost = (float) armaments.optDouble("shipsDemandModerateBuyPriceBoost", 0.65);
-            shipsDemandHighBuyPriceBoost = (float) armaments.optDouble("shipsDemandHighBuyPriceBoost", 1.05);
+            shipsDemandHighBuyPriceBoost = (float) armaments.optDouble("shipsDemandHighBuyPriceBoost", 1.45);
 
             // Small Credit Bonus for selling exotic and faction design type ships for parent factions
             isFactionBuybackProgramActive = armaments.optBoolean("isFactionBuybackProgramActive", true);
@@ -135,22 +135,22 @@ public class RTConfig {
             weaponsDemandHighSellPriceBoost = (float) armaments.optDouble("weaponsDemandHighSellPriceBoost", 0.40);
             // Weapons Buying Price boost
             weaponsDemandMinorBuyPriceBoost = (float) armaments.optDouble("weaponsDemandMinorBuyPriceBoost", 0.15);
-            weaponsDemandModerateBuyPriceBoost = (float) armaments.optDouble("weaponsDemandModerateBuyPriceBoost", 0.25);
-            weaponsDemandHighBuyPriceBoost = (float) armaments.optDouble("weaponsDemandHighBuyPriceBoost", 0.45);
+            weaponsDemandModerateBuyPriceBoost = (float) armaments.optDouble("weaponsDemandModerateBuyPriceBoost", 0.30);
+            weaponsDemandHighBuyPriceBoost = (float) armaments.optDouble("weaponsDemandHighBuyPriceBoost", 0.50);
 
             // War boost
-            shipWarPricesBonus = (float) armaments.optDouble("shipWarPricesBonus",0.10);
+            shipWarPricesBonus = (float) armaments.optDouble("shipWarPricesBonus",0.15);
             weaponsWarPricesBonus = (float) armaments.optDouble("weaponsWarPricesBonus", 0.10);
 
             // Multiple war boost
-            shipMultipleWarsPricesBonus = (float) armaments.optDouble("shipMultipleWarsPricesBonus", 0.20);
+            shipMultipleWarsPricesBonus = (float) armaments.optDouble("shipMultipleWarsPricesBonus", 30);
             weaponsMultipleWarsPricesBonus = (float) armaments.optDouble("weaponsMultipleWarsPricesBonus", 0.20);
 
             //Ship & weapons Prices Max Multiplier over Base Price
-            maxShipSellPriceMult = (float) armaments.optDouble("maxShipSellPriceMult", 1.3);
-            maxShipBuyPriceMult = (float) armaments.optDouble("maxShipBuyPriceMult", 1.3);
-            maxWeaponSellPriceMult = (float) armaments.optDouble("maxWeaponSellPriceMult", 1.3);
-            maxWeaponBuyPriceMult = (float) armaments.optDouble("maxWeaponBuyPriceMult", 1.3);
+            maxShipSellPriceMult = (float) armaments.optDouble("maxShipSellPriceMult", 1.8);
+            maxShipBuyPriceMult = (float) armaments.optDouble("maxShipBuyPriceMult", 1.8);
+            maxWeaponSellPriceMult = (float) armaments.optDouble("maxWeaponSellPriceMult", 1.8);
+            maxWeaponBuyPriceMult = (float) armaments.optDouble("maxWeaponBuyPriceMult", 1.8);
 
             mapCommoditiesAndTheirTariffImpact();
 

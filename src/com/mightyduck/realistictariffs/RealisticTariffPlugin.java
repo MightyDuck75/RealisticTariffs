@@ -15,7 +15,6 @@ public class RealisticTariffPlugin extends BaseModPlugin {
     // A temporary list to hold our intel while the game is saving
     private transient List<ShipHullsWeaponsMarketIntel> backUpShipWeaponsIntelForSaveCompatibility = new ArrayList<>();
     private transient List<DeficitTariffMarketIntel> backUpDeficitTariffMarketIntelForGameCompatibility = new ArrayList<>();
-    private static final Logger log = Global.getLogger(RealisticTariffPlugin.class);
 
     private void saveOriginalPriceVariablesFromSettings(){
         originalShipSellPriceMult = Global.getSettings().getFloat("shipSellPriceMult");
