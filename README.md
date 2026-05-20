@@ -109,34 +109,34 @@ in the trade section, while markets with more missing goods will be placed in th
 ---
 
 ## Final Thoughts 
-I'm pretty particular about mods. I usually prefer the developer’s original vision because I feel like it's easy for mods
-to damage that unified feel & vision. Secondly, anything that breaks my immersion or suspension of disbelief really
-puts me off. That said, I’m really happy with this mod. As a personal user, it feels like a perfectly fitted
-shirt, it just enhances the vanilla experience without getting in the way. The exporter rebate was unfortunately a necessary
-workaround. On paper, it might have been off-putting to me, but when I compare it to vanilla which is x100 time more egregious with
-the immersion-breaking high export tariffs, it actually feels like sweet justice getting that rebate! :P
-If you have any feedback that can improve this mod I will read it and if it makes sense to me, I will try to implement it. I also 
-have a few more ideas for mods to fix some bad game design mechanics & others that improve the game, so likes, stars,.. are
-always welcomed!
+I’m pretty picky with mods. I usually stick to the developer’s original vision, since mods can easily mess with the overall feel of the game. <br>Anything that breaks immersion is a dealbreaker for me.
+That said, I’m really happy with this one. It fits naturally into the vanilla experience and improves it without getting in the way.<br>
+The exporter rebate is a workaround, but a necessary one. It might seem odd at first, but compared to how extreme the vanilla export tariffs are, it actually feels more balanced.<br>
+If you have feedback, I’m open to it and will consider changes that make sense. I’ve also got a few more mod ideas in mind to improve some bad gameplay designs and stars and support are always appreciated.
+
+
 
 ## 📥 Installation
 1.  Download the latest release.
-2.  Extract into your `Starsector/mods` folder, the folder structure should be "..\StarSector.v0.9.8a-RC8\game\mods\RealisticTariffs\"
+2.  Extract into your `Starsector/mods` folder, the folder structure should be "..\StarSector.v0.9.8a-RC8\game\mods\RealisticTariffs\(files)"
 3.  Enable **Realistic Tariffs** in the launcher.
 
 ## F.A.Q
-1 - Does this work with Nexerelin ?
+**1 - Does this work with Nexerelin ?**
+
 Yes, from my limited testing it works as intended due to telling in mod_info.json to run after nexerelin, nexerelin also modifies tariffs but as this mod runs after it nullfies nexerelin mod changes.
 
-2 - Can I disable Tariff Rebates and Factional ship buybacks?
+**2 - Can I disable Tariff Rebates and Factional ship buybacks?**
+
 Yes, just go to the mod folder -> data -> config -> rt_settings.json and set the "isExportRebateActive" to false and the same for "isFactionBuybackProgramActive" ..
 
-3 - Can I change tariffs values and other settings in this mod?
+**3 - Can I change tariffs values and other settings in this mod?**
+
 Yes, there is a number of settings you can change just go to mod folder -> data -> config -> rt_settings.json
 
 
 ## Scope of the implementation / Q & A Testing
-- A known markets with deficits that reduce tariffs to under 9% are put in the important section while the others are can be found in the trade section
+- A known market with deficits that reduce tariffs to under 9% is put in the important section while the others can be found in the trade section
   - Markets with deficits in just illegal commodities are found in trade section
   - Illicit commodities like Drugs and Organs don't lower global tariffs but generate an intel entry about the demand from illicit goods
 - All demand intel is trackable on map and uses the icon of the faction that currently owns that market
@@ -148,9 +148,9 @@ Yes, there is a number of settings you can change just go to mod folder -> data 
 - Ships & Weapons prices increase when a market faction is at war, 15% with 1 faction war & 30% if at war with more than 1 faction
   - Pirates & Luddic Path don't count as factional wars.
   - An Intel entry is generated for a faction engaged in 1 factional war and another for when it's engaged in more than 1 factional war
-- Factions who have ship design types (pirates, hegemony..) when at war issue a Ship Buyback Program that further boosts prices(+10%) & gives reputation(+1)
+- Factions who have ship design types (hegemony, Tritachyon..) when at war issue a Ship Buyback Program that further boosts prices(+10%) & gives reputation(+1)
   - Selling factional ships to other factions when these are engaged in factional wars reduces player reputation(-1) with the design faction
-  - The Ship Buyback Program credit boost is calculated on the base sale value if in pristine condition, or if the ship has D-mods it adjusts it with "hullWithDModsSellPriceMult"
+  - The Ship Buyback Program credit boost is calculated on the base sale value if in pristine condition, if the ship has D-mods it adjusts it with "hullWithDModsSellPriceMult"
   - Factions without ship designs do not generate a Ship buyback program event
 - Rare/Exotic Factional Ships like XIV Battleground and Lion's Guard Ships also provide a boost in credits(+20%) and a bigger reputation reward(+4), if sold to another faction it damages reputation(-8)
 - Users can change some values of this mod by going to \RealisticTariffs\data\config\rt_settings.json like:
