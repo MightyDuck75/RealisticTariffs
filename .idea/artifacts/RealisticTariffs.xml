@@ -17,6 +17,7 @@
       <element id="directory" name="graphics">
         <element id="dir-copy" path="$PROJECT_DIR$/graphics/icons" />
       </element>
+      <element id="file-copy" path="$PROJECT_DIR$/CHANGELOG.md" />
     </root>
   </artifact>
 </component>
