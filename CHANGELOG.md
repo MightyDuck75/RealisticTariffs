@@ -1,4 +1,15 @@
-## [0.9.1] Realistic Tariffs - 2026-05-19
+## [0.9.2] - 2026-05-22
+
+### 🐛 Bug Fixes
+
+- The images were not going to expected parent folder
+
+### 🚜 Refactor
+
+- Removed unused dependencies from mod_info.json
+
+
+## [0.9.1] - 2026-05-19
 
 ### 🚀 Features
 
@@ -42,7 +53,16 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Modified .gitignore to ignore artifacts
+- Remove build artifacts from repository
+- Updated readme and uploaded relevant imgs
+- Added images to readme
+- Improved the readme & some light refactor
+- Refactoring and removing magic numbers
+- Improved the README.md and more refactoring & following naming conventions
 - Extracted logic to private methods for better readability
 - Removing obvious comments and removing some magic numbers
-- Further removal of unused comments
+- Further removal of used comments
 - Future proof any possible custom icon for buybacks
+- Added new picture to be used in the readme
+- Improved the readme
