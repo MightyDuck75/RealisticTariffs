@@ -11,10 +11,6 @@
   "gameVersion": "0.98a-RC8",
   "java17": true,
   "jars": ["jars/RealisticTariffs.jar"],
-  "dependencies": [
-    {"id": "lw_lazylib", "name": "LazyLib"},
-    {"id": "MagicLib", "name": "MagicLib"}
-  ],
   "after": ["nexerelin"],
   "modPlugin": "com.mightyduck.realistictariffs.RealisticTariffPlugin"
 }

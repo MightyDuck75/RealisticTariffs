@@ -15,7 +15,9 @@
         <element id="dir-copy" path="$PROJECT_DIR$/data" />
       </element>
       <element id="directory" name="graphics">
-        <element id="dir-copy" path="$PROJECT_DIR$/graphics/icons" />
+        <element id="directory" name="icons">
+          <element id="dir-copy" path="$PROJECT_DIR$/graphics/icons" />
+        </element>
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/CHANGELOG.md" />
       <element id="file-copy" path="$PROJECT_DIR$/LICENSE" />
